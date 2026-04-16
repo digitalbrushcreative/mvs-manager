@@ -5,7 +5,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+// strict: false lets PUT /api/store/:key accept top-level primitives
+// (e.g. boolean for the 'seeded' flag). Arrays and objects still work.
+app.use(express.json({ limit: '10mb', strict: false }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'mvs-manager-api' }));
 
