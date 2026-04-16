@@ -1,12 +1,15 @@
 /* ==========================================
-   BANNER — active trip header
+   BANNER — trip switcher + active trip header
    ========================================== */
 
 const Banner = {
   render() {
     const trip = Store.activeTrip();
+    const wrapper = html`<div class="trip-context"></div>`;
+    wrapper.appendChild(this.renderSwitcher(trip));
+
     if (!trip) {
-      return html`
+      wrapper.appendChild(html`
         <div class="trip-banner">
           <div class="banner-grid">
             <div>
@@ -18,13 +21,65 @@ const Banner = {
             </div>
           </div>
         </div>
-      `;
+      `);
+      wrapper.querySelector('#bannerNewTrip')?.addEventListener('click', () => TripForm.open());
+      return wrapper;
     }
 
+    wrapper.appendChild(this.renderBanner(trip));
+    return wrapper;
+  },
+
+  renderSwitcher(activeTrip) {
+    const trips = Store.getTrips();
+    const activeId = activeTrip?.id;
+
+    const bar = html`<div class="trip-switcher-bar"></div>`;
+    const pills = html`<div class="trip-switcher-pills"></div>`;
+
+    trips.forEach(t => {
+      const stats = Store.tripStats(t.id) || {};
+      const days = Fmt.daysUntil ? Fmt.daysUntil(t.startDate) : null;
+      const countdown = days > 0 ? `T-${days}` : days === 0 ? 'Today' : days < 0 ? `${Math.abs(days)}d ago` : '';
+      const pill = html`
+        <button class="trip-pill ${t.id === activeId ? 'active' : ''}" data-trip-id="${t.id}" type="button">
+          <span class="status-dot status-${t.status}"></span>
+          <span class="pill-body">
+            <span class="pill-code">${escapeHtml(t.code)}</span>
+            <span class="pill-name">${escapeHtml(t.name)}</span>
+          </span>
+          <span class="pill-meta">
+            <span class="pill-count">${stats.enrolled ?? 0}/${t.seatsTotal || 0}</span>
+            ${countdown ? `<span class="pill-countdown">${countdown}</span>` : ''}
+          </span>
+        </button>
+      `;
+      pill.addEventListener('click', () => {
+        if (t.id === activeId) return;
+        Store.setActiveTrip(t.id);
+        Toast.info(`Switched to ${t.code}`);
+      });
+      pills.appendChild(pill);
+    });
+
+    const addBtn = html`
+      <button class="trip-pill trip-pill-add" type="button" title="Create a new trip">
+        <span class="plus">+</span>
+        <span>New trip</span>
+      </button>
+    `;
+    addBtn.addEventListener('click', () => TripForm.open());
+    pills.appendChild(addBtn);
+
+    bar.appendChild(html`<span class="trip-switcher-label">Active trip</span>`);
+    bar.appendChild(pills);
+    return bar;
+  },
+
+  renderBanner(trip) {
     const stats = Store.tripStats(trip.id);
     const daysUntil = stats.daysUntil;
     const countdownStr = daysUntil > 0 ? `T-${daysUntil} days` : daysUntil === 0 ? 'Today!' : `${Math.abs(daysUntil)} days ago`;
-    const trips = Store.getTrips();
 
     const banner = html`
       <div class="trip-banner">
@@ -36,9 +91,6 @@ const Banner = {
               <span>${escapeHtml(trip.code)}</span>
               <span class="sep">·</span>
               <span>${countdownStr}</span>
-              <select class="trip-switcher" id="tripSwitcher">
-                ${trips.map(t => `<option value="${t.id}" ${t.id === trip.id ? 'selected' : ''}>${escapeHtml(t.code)} — ${escapeHtml(t.name)}</option>`).join('')}
-              </select>
             </div>
             <h1 class="banner-title">${escapeHtml(trip.name.split(' ').slice(0, -1).join(' '))} <span class="accent">${escapeHtml(trip.name.split(' ').slice(-1)[0])}</span></h1>
             <div class="banner-meta">
@@ -71,14 +123,8 @@ const Banner = {
       </div>
     `;
 
-    banner.querySelector('#tripSwitcher')?.addEventListener('change', (e) => {
-      Store.setActiveTrip(e.target.value);
-      Toast.info(`Switched to ${Store.activeTrip()?.code}`);
-    });
     banner.querySelector('#bannerAddPupil')?.addEventListener('click', () => PupilForm.open());
     banner.querySelector('#bannerEditTrip')?.addEventListener('click', () => TripForm.open(trip.id));
-    banner.querySelector('#bannerNewTrip')?.addEventListener('click', () => TripForm.open());
-
     return banner;
   }
 };

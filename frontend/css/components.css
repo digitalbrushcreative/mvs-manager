@@ -529,6 +529,148 @@
 .banner-eyebrow .badge-local { background: #5a8a3d; }
 .banner-eyebrow .sep { opacity: 0.4; }
 
+/* ---------- Trip context wrapper ---------- */
+.trip-context { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.trip-context .trip-banner { margin-bottom: 0; }
+
+/* ---------- Trip switcher bar ---------- */
+.trip-switcher-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0;
+}
+.trip-switcher-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--grey-500);
+  font-weight: 600;
+  flex-shrink: 0;
+  padding-left: 2px;
+}
+.trip-switcher-pills {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.trip-switcher-pills::-webkit-scrollbar { height: 6px; }
+.trip-switcher-pills::-webkit-scrollbar-thumb { background: var(--grey-200); border-radius: 3px; }
+
+.trip-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--white);
+  border: 1px solid var(--grey-200);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all var(--t-fast);
+  min-width: 0;
+  flex-shrink: 0;
+  position: relative;
+}
+.trip-pill:hover {
+  border-color: var(--navy-soft);
+  background: var(--grey-50);
+}
+.trip-pill.active {
+  background: var(--navy-darker);
+  border-color: var(--navy-darker);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(22, 33, 63, 0.15);
+}
+.trip-pill.active:hover {
+  background: var(--navy-deep);
+}
+
+.trip-pill .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--grey-300);
+  flex-shrink: 0;
+}
+.trip-pill .status-dot.status-draft { background: var(--grey-400); }
+.trip-pill .status-dot.status-open { background: var(--success); }
+.trip-pill .status-dot.status-closed { background: var(--warning); }
+.trip-pill .status-dot.status-in-progress { background: var(--info); }
+.trip-pill .status-dot.status-complete { background: var(--grey-500); }
+.trip-pill .status-dot.status-cancelled { background: var(--crimson); }
+
+.trip-pill .pill-body {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  text-align: left;
+  min-width: 0;
+}
+.trip-pill .pill-code {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+.trip-pill.active .pill-code { opacity: 0.8; color: var(--gold); }
+.trip-pill .pill-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grey-900);
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trip-pill.active .pill-name { color: var(--white); }
+
+.trip-pill .pill-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+  padding-left: 4px;
+  border-left: 1px solid var(--grey-100);
+  margin-left: 4px;
+  padding-left: 10px;
+}
+.trip-pill.active .pill-meta { border-left-color: rgba(255,255,255,0.12); }
+.trip-pill .pill-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--grey-700);
+}
+.trip-pill.active .pill-count { color: var(--white); }
+.trip-pill .pill-countdown {
+  font-size: 10px;
+  color: var(--grey-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.trip-pill.active .pill-countdown { color: rgba(255,255,255,0.65); }
+
+.trip-pill-add {
+  border-style: dashed;
+  color: var(--grey-500);
+}
+.trip-pill-add:hover {
+  border-color: var(--crimson);
+  color: var(--crimson);
+  background: var(--crimson-soft);
+}
+.trip-pill-add .plus {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+}
+
 h1.banner-title {
   font-family: var(--display);
   font-weight: 700;
@@ -554,23 +696,6 @@ h1.banner-title {
 .banner-meta-item svg { width: 15px; height: 15px; color: var(--gold); }
 .banner-meta-item strong { color: var(--white); font-weight: 600; }
 .banner-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
-
-.trip-switcher {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: var(--r-md);
-  color: var(--white);
-  font-size: 12px;
-  cursor: pointer;
-  transition: background var(--t-fast);
-  margin-left: auto;
-}
-.trip-switcher:hover { background: rgba(255,255,255,0.15); }
-.trip-switcher svg { width: 12px; height: 12px; opacity: 0.7; }
 
 /* -------- TOAST -------- */
 #toastRoot {
