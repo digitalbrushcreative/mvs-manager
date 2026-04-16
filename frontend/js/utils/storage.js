@@ -30,29 +30,57 @@ const StorageKeys = {
 
 const Storage = (function () {
   const cache = new Map();
-  const pending = new Map(); // key -> timeout id (debounce)
-  const DEBOUNCE_MS = 150;
+  const pending = new Map(); // key -> { timer, value }
+  const DEBOUNCE_MS = 50;
   let booted = false;
 
   function scheduleWrite(key, value) {
-    if (pending.has(key)) clearTimeout(pending.get(key));
-    pending.set(key, setTimeout(async () => {
+    const existing = pending.get(key);
+    if (existing) clearTimeout(existing.timer);
+    const entry = { value, timer: null };
+    entry.timer = setTimeout(async () => {
       pending.delete(key);
       try {
-        await Api.put(key, value);
+        await Api.put(key, entry.value);
       } catch (firstErr) {
         console.warn('[Storage] PUT failed (will retry once)', key, firstErr);
-        // Retry once — common cause is a transient network blip during backend hot-reload.
         try {
           await new Promise(r => setTimeout(r, 300));
-          await Api.put(key, value);
+          await Api.put(key, entry.value);
         } catch (err) {
           console.error('[Storage] PUT failed permanently for', key, err);
           if (typeof Toast !== 'undefined') Toast.error('Could not save to server: ' + key.replace('mvs-trips:', ''));
         }
       }
-    }, DEBOUNCE_MS));
+    }, DEBOUNCE_MS);
+    pending.set(key, entry);
   }
+
+  // Flush every queued write synchronously with fetch({ keepalive: true }),
+  // which allows the request to outlive the current page. Called on pagehide
+  // so edits made just before a refresh or close still land in the backend.
+  function flushPending() {
+    const base = ((window.MVS_API_BASE || 'http://localhost:3001') + '/api/store/');
+    for (const [key, entry] of pending) {
+      clearTimeout(entry.timer);
+      try {
+        fetch(base + encodeURIComponent(key), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(entry.value),
+          keepalive: true
+        });
+      } catch (err) {
+        console.warn('[Storage] keepalive PUT failed for', key, err);
+      }
+    }
+    pending.clear();
+  }
+  window.addEventListener('pagehide', flushPending);
+  // visibilitychange fires earlier on mobile / tab switch — catches more cases.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushPending();
+  });
 
   async function bootstrap() {
     const remote = await Api.bootstrap();
@@ -99,6 +127,7 @@ const Storage = (function () {
   return {
     bootstrap,
     get, set, remove, clear,
+    flush: flushPending,
     import: importData,
     export: exportData,
     isBooted: () => booted
