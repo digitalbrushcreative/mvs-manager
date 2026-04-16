@@ -21,8 +21,37 @@ function writeKey(key, value) {
 
 function sanitizeUser(u) {
   if (!u) return null;
-  const { passwordHash, ...safe } = u;
+  const { password, passwordHash, ...safe } = u;
   return safe;
+}
+
+// First-run bootstrap: if no users exist yet, insert the two demo accounts
+// so the login form works out of the box. Idempotent.
+const DEFAULT_USERS = [
+  {
+    id: 'user_admin',
+    email: 'admin@mvs.test',
+    password: 'admin123',
+    role: 'admin',
+    name: 'Trips Coordinator',
+    linkedPupilIds: [],
+    linkedInterestTokens: []
+  },
+  {
+    id: 'user_parent',
+    email: 'parent@example.com',
+    password: 'parent123',
+    role: 'parent',
+    name: 'Parent',
+    linkedPupilIds: [],
+    linkedInterestTokens: []
+  }
+];
+function ensureDefaultUsers() {
+  const existing = readKey(USERS_KEY, []);
+  if (existing.length) return existing;
+  writeKey(USERS_KEY, DEFAULT_USERS);
+  return DEFAULT_USERS;
 }
 
 function newToken() {
@@ -34,7 +63,7 @@ function newToken() {
 router.post('/login', (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) return res.status(400).json({ error: 'email and password required' });
-  const users = readKey(USERS_KEY, []);
+  const users = ensureDefaultUsers();
   const user = users.find(u => u.email.toLowerCase() === String(email).toLowerCase());
   if (!user || user.password !== password) {
     return res.status(401).json({ error: 'Invalid email or password' });
