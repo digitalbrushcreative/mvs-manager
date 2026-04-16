@@ -422,10 +422,18 @@ const Store = (function () {
       F: pupils.filter(p => p.gender === 'F').length
     };
 
+    const chaperones = trip.chaperones || 0;
+    const parentsJoining = trip.parentsJoining || 0;
+    const seatsUsed = pupils.length + chaperones + parentsJoining;
+
     return {
       trip,
       enrolled: pupils.length,
-      seatsLeft: trip.seatsTotal - pupils.length,
+      chaperones,
+      parentsJoining,
+      seatsUsed,
+      seatsLeft: Math.max(0, (trip.seatsTotal || 0) - seatsUsed),
+      overCapacity: seatsUsed > (trip.seatsTotal || 0),
       totalExpected,
       collected,
       outstanding: totalExpected - collected,

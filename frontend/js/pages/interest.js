@@ -32,7 +32,8 @@ const InterestPage = (function () {
     const active = all.filter(i => ACTIVE_STATUSES.has(i.status)).length;
     const converted = all.filter(i => i.status === 'converted').length;
     const declined = all.filter(i => i.status === 'declined').length;
-    const seatsLeft = Math.max(0, (trip.seatsTotal || 0) - Store.getPupils(trip.id).length);
+    const stats = Store.tripStats(trip.id);
+    const seatsLeft = stats.seatsLeft;
 
     const kpiRow = html`
       <div class="kpi-grid">

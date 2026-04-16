@@ -25,6 +25,7 @@ const Seed = {
         costPerPupil: 3000,
         currency: 'USD',
         chaperones: 4,
+        parentsJoining: 6,
         description: '12-day expedition across Malaysia covering cultural heritage, natural wonders, and educational visits.',
         installments: [
           { id: 'i1', name: 'Deposit', amount: 500, dueDate: '2026-02-15' },
@@ -48,6 +49,7 @@ const Seed = {
         costPerPupil: 4500,
         currency: 'USD',
         chaperones: 3,
+        parentsJoining: 4,
         description: 'Educational tour of UK universities, museums, and historical sites.',
         installments: [],
         createdAt: '2025-11-01T00:00:00Z'
@@ -66,6 +68,7 @@ const Seed = {
         costPerPupil: 450,
         currency: 'USD',
         chaperones: 4,
+        parentsJoining: 2,
         description: 'Hands-on marine conservation programme along the Kenyan coast.',
         installments: [],
         createdAt: '2026-03-01T00:00:00Z'
@@ -84,6 +87,7 @@ const Seed = {
         costPerPupil: 280,
         currency: 'USD',
         chaperones: 5,
+        parentsJoining: 3,
         description: '5-day wildlife and conservation experience.',
         installments: [],
         createdAt: '2026-03-15T00:00:00Z'

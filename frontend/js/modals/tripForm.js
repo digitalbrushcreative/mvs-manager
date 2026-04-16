@@ -58,13 +58,18 @@ const TripForm = {
               <label class="form-label">End date <span class="required">*</span></label>
               <input class="form-input" type="date" name="endDate" value="${trip.endDate ? trip.endDate.slice(0,10) : ''}" required>
             </div>
-            <div class="form-field">
-              <label class="form-label">Total seats</label>
+            <div class="form-field col-span-2">
+              <label class="form-label">Total seats <span class="required">*</span></label>
               <input class="form-input" type="number" name="seatsTotal" min="0" value="${trip.seatsTotal}">
+              <div class="form-hint" id="seatsHint" style="font-size:12px; color:var(--grey-500); margin-top:4px;"></div>
             </div>
             <div class="form-field">
               <label class="form-label">Chaperones</label>
               <input class="form-input" type="number" name="chaperones" min="0" value="${trip.chaperones}">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Parents joining</label>
+              <input class="form-input" type="number" name="parentsJoining" min="0" value="${trip.parentsJoining || 0}">
             </div>
           </div>
         </div>
@@ -97,6 +102,24 @@ const TripForm = {
       const prefix = body.querySelector('#tripCurPrefix');
       prefix.textContent = e.target.value === 'KES' ? 'KSh' : e.target.value === 'GBP' ? '£' : e.target.value === 'EUR' ? '€' : '$';
     });
+
+    // Live seats breakdown: pupils enrolled + chaperones + parents vs total seats
+    const seatsHint = body.querySelector('#seatsHint');
+    const seatsTotalInput = body.querySelector('[name=seatsTotal]');
+    const chapInput = body.querySelector('[name=chaperones]');
+    const parentsInput = body.querySelector('[name=parentsJoining]');
+    function updateSeatsHint() {
+      const total = parseInt(seatsTotalInput.value, 10) || 0;
+      const chap = parseInt(chapInput.value, 10) || 0;
+      const par = parseInt(parentsInput.value, 10) || 0;
+      const enrolled = isEdit ? Store.getPupils(tripId).length : 0;
+      const used = enrolled + chap + par;
+      const left = total - used;
+      seatsHint.textContent = `${enrolled} pupil${enrolled === 1 ? '' : 's'} + ${chap} chaperone${chap === 1 ? '' : 's'} + ${par} parent${par === 1 ? '' : 's'} = ${used} of ${total} seats · ${left >= 0 ? left + ' left' : Math.abs(left) + ' over capacity'}`;
+      seatsHint.style.color = left < 0 ? 'var(--crimson)' : left <= 2 ? 'var(--warning)' : 'var(--grey-500)';
+    }
+    [seatsTotalInput, chapInput, parentsInput].forEach(el => el.addEventListener('input', updateSeatsHint));
+    updateSeatsHint();
 
     const modal = Modal.open({
       title: isEdit ? 'Edit trip' : 'New trip',
@@ -136,6 +159,16 @@ const TripForm = {
         return;
       }
 
+      const seatsTotal = parseInt(val('seatsTotal'), 10) || 0;
+      const chaperones = parseInt(val('chaperones'), 10) || 0;
+      const parentsJoining = parseInt(val('parentsJoining'), 10) || 0;
+      const enrolled = isEdit ? Store.getPupils(tripId).length : 0;
+      const used = enrolled + chaperones + parentsJoining;
+      if (seatsTotal > 0 && used > seatsTotal) {
+        Toast.error(`Over capacity: ${used} seats needed but only ${seatsTotal} total. Increase total seats or reduce chaperones/parents.`);
+        return;
+      }
+
       const data = {
         code: val('code').trim(),
         name: val('name').trim(),
@@ -147,6 +180,7 @@ const TripForm = {
         endDate: val('endDate'),
         seatsTotal: parseInt(val('seatsTotal'), 10) || 0,
         chaperones: parseInt(val('chaperones'), 10) || 0,
+        parentsJoining: parseInt(val('parentsJoining'), 10) || 0,
         costPerPupil: parseFloat(val('costPerPupil')) || 0,
         currency: val('currency') || 'USD'
       };

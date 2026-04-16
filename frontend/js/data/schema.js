@@ -33,6 +33,7 @@ const Schema = {
       costPerPupil: 0,
       currency: 'USD',
       chaperones: 0,
+      parentsJoining: 0,
       description: '',
       installments: [],
       createdAt: new Date().toISOString(),
