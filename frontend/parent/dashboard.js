@@ -37,6 +37,17 @@
   renderPupils(user);
   renderInterests(user);
 
+  // Live refresh every 20s so admin changes (payments, docs, status) surface automatically.
+  setInterval(async () => {
+    try {
+      await Storage.bootstrap();
+      renderPupils(user);
+      renderInterests(user);
+    } catch (err) {
+      console.warn('[dashboard] refresh failed', err);
+    }
+  }, 20000);
+
   // ---------- Pupil cards ----------
   function renderPupils(user) {
     const root = document.getElementById('pupilsRoot');

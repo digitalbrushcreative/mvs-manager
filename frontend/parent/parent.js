@@ -31,24 +31,36 @@
   }
 
   // ---------- Brochure ----------
+  let currentTrips = [];
   async function renderBrochure() {
+    await loadAndRenderTrips();
+    // Live refresh every 20s so admin changes surface automatically.
+    setInterval(loadAndRenderTrips, 20000);
+    root.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-interest-trip]');
+      if (btn) openInterestForm(btn.dataset.interestTrip, currentTrips.find(t => t.id === btn.dataset.interestTrip));
+    });
+  }
+
+  async function loadAndRenderTrips() {
     try {
       const res = await fetch(`${API}/public/trips`);
       if (!res.ok) throw new Error('Could not load trips');
       const trips = await res.json();
+      // Skip re-render if nothing changed (avoids flicker during polling).
+      const sig = JSON.stringify(trips);
+      if (sig === root._lastSig) return;
+      root._lastSig = sig;
+      currentTrips = trips;
       root.setAttribute('aria-busy', 'false');
       if (!trips.length) {
         root.innerHTML = '<div class="empty">No trips available right now. Check back soon.</div>';
         return;
       }
       root.innerHTML = trips.map(tripCard).join('');
-      root.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-interest-trip]');
-        if (btn) openInterestForm(btn.dataset.interestTrip, trips.find(t => t.id === btn.dataset.interestTrip));
-      });
     } catch (err) {
       root.setAttribute('aria-busy', 'false');
-      root.innerHTML = `<div class="empty">Couldn't load trips. ${escapeHtml(err.message)}</div>`;
+      if (!root._lastSig) root.innerHTML = `<div class="empty">Couldn't load trips. ${escapeHtml(err.message)}</div>`;
     }
   }
 
@@ -56,10 +68,18 @@
     const days = daysBetween(t.startDate, t.endDate);
     const grades = (t.gradesAllowed || []).join(', ');
     const cost = `${currencySymbol(t.currency)}${Number(t.costPerPupil || 0).toLocaleString()}`;
+    const acceptingInterest = !['closed', 'in-progress'].includes(t.status);
+    const statusLabel = ({
+      'draft': 'Planning', 'open': 'Open for registration',
+      'closed': 'Registration closed', 'in-progress': 'Trip under way'
+    })[t.status] || t.status;
     return `
       <article class="trip-card">
         <div class="trip-card-banner ${t.tripType === 'local' ? 'local' : ''}">
-          <span class="trip-card-type">${escapeHtml(t.tripType || 'international')}</span>
+          <div style="display:flex; gap:6px; align-items:center; margin-bottom:10px;">
+            <span class="trip-card-type">${escapeHtml(t.tripType || 'international')}</span>
+            <span class="trip-card-type" style="background:rgba(255,255,255,0.08);">${escapeHtml(statusLabel)}</span>
+          </div>
           <h2 class="trip-card-title">${escapeHtml(t.name)}</h2>
           <div class="trip-card-destination">${escapeHtml(t.destination || '')}</div>
         </div>
@@ -89,7 +109,9 @@
               <div class="per">per pupil · ${escapeHtml(t.currency || 'USD')}</div>
             </div>
           </div>
-          <button class="trip-card-interest" data-interest-trip="${t.id}">I'm interested</button>
+          ${acceptingInterest
+            ? `<button class="trip-card-interest" data-interest-trip="${t.id}">I'm interested</button>`
+            : `<button class="trip-card-interest" disabled style="background:var(--grey-300); cursor:not-allowed;">Not taking new registrations</button>`}
         </div>
       </article>
     `;

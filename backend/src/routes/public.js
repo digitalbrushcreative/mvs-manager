@@ -33,15 +33,19 @@ function publicTrip(t) {
     currency: t.currency,
     gradesAllowed: t.gradesAllowed,
     tripType: t.tripType || 'international',
+    status: t.status,
     seatsTotal: t.seatsTotal,
-    chaperones: t.chaperones
+    chaperones: t.chaperones,
+    parentsJoining: t.parentsJoining || 0
   };
 }
 
 router.get('/trips', (_req, res) => {
   const trips = readKey(TRIPS_KEY) || [];
-  const publicStatuses = new Set(['open', 'draft']);
-  res.json(trips.filter(t => publicStatuses.has(t.status)).map(publicTrip));
+  // Show everything that isn't finished or called off; admin uses the
+  // 'status' field on each card so parents can tell what's bookable.
+  const hidden = new Set(['cancelled', 'complete']);
+  res.json(trips.filter(t => !hidden.has(t.status)).map(publicTrip));
 });
 
 router.post('/interests', (req, res) => {
