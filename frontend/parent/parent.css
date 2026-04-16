@@ -1,0 +1,240 @@
+/* Parent-facing brochure page */
+
+body {
+  background: var(--off-white);
+  font-family: var(--sans);
+  color: var(--grey-900);
+  margin: 0;
+}
+
+.parent-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--grey-100);
+  box-shadow: var(--shadow-sm);
+}
+.parent-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.parent-brand { display: flex; align-items: center; gap: 14px; }
+.parent-brand .crest { width: 44px; height: 44px; }
+.parent-brand .crest svg { width: 100%; height: 100%; }
+.parent-brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.parent-brand-text .line1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--navy);
+}
+.parent-brand-text .line2 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--grey-500);
+}
+.parent-admin-link {
+  font-size: 13px;
+  color: var(--grey-500);
+  text-decoration: none;
+  font-weight: 500;
+}
+.parent-admin-link:hover { color: var(--navy); }
+
+.parent-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+
+.parent-hero { margin-bottom: 40px; max-width: 720px; }
+.parent-hero h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 36px;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
+  color: var(--navy-darker);
+}
+.parent-hero p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--grey-500);
+  margin: 0;
+}
+
+.trips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+.trips-grid .loading,
+.trips-grid .empty {
+  grid-column: 1 / -1;
+  padding: 48px;
+  text-align: center;
+  color: var(--grey-400);
+  background: var(--white);
+  border: 1px dashed var(--grey-200);
+  border-radius: var(--r-lg);
+}
+
+.trip-card {
+  background: var(--white);
+  border: 1px solid var(--grey-100);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--t-med), transform var(--t-med);
+}
+.trip-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+.trip-card-banner {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+  color: var(--white);
+  padding: 22px 24px 18px;
+}
+.trip-card-banner.local { background: linear-gradient(135deg, #4a7a2d 0%, #2e5019 100%); }
+.trip-card-type {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 3px 10px;
+  background: rgba(255,255,255,0.18);
+  border-radius: var(--r-sm);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.trip-card-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.25;
+  margin: 0 0 6px;
+}
+.trip-card-destination {
+  font-size: 14px;
+  opacity: 0.85;
+}
+.trip-card-body {
+  padding: 20px 24px 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.trip-card-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--grey-500);
+  margin: 0 0 18px;
+}
+.trip-card-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--grey-100);
+  border-bottom: 1px solid var(--grey-100);
+  margin-bottom: 18px;
+}
+.trip-card-meta-item { display: flex; flex-direction: column; gap: 2px; }
+.trip-card-meta-item .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--grey-400);
+  font-weight: 600;
+}
+.trip-card-meta-item .value {
+  font-size: 15px;
+  color: var(--grey-900);
+  font-weight: 600;
+}
+.trip-card-cost {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.trip-card-cost .amount {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--navy-darker);
+}
+.trip-card-cost .per {
+  font-size: 13px;
+  color: var(--grey-500);
+}
+.trip-card-interest {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--crimson);
+  color: var(--white);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.trip-card-interest:hover { background: var(--crimson-deep); }
+
+/* Interest form overrides in modal */
+#interestForm .form-field { margin-bottom: 14px; }
+#interestForm label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--grey-500);
+  margin-bottom: 6px;
+}
+#interestForm input,
+#interestForm select,
+#interestForm textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-family: var(--sans);
+  background: var(--white);
+  box-sizing: border-box;
+}
+#interestForm input:focus,
+#interestForm select:focus,
+#interestForm textarea:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+#interestForm textarea { resize: vertical; min-height: 72px; }
+#interestForm .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#interestForm .required { color: var(--crimson); }
+
+.parent-thanks {
+  text-align: center;
+  padding: 40px 24px;
+}
+.parent-thanks h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  color: var(--navy-darker);
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+.parent-thanks p {
+  color: var(--grey-500);
+  margin: 0;
+  line-height: 1.6;
+}

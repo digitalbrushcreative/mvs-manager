@@ -32,6 +32,7 @@ const Banner = {
           <div>
             <div class="banner-eyebrow">
               <span class="badge">${escapeHtml(trip.status)}</span>
+              ${trip.tripType ? `<span class="badge badge-${trip.tripType}">${escapeHtml(trip.tripType)}</span>` : ''}
               <span>${escapeHtml(trip.code)}</span>
               <span class="sep">·</span>
               <span>${countdownStr}</span>

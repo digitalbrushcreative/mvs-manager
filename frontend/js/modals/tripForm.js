@@ -25,6 +25,14 @@ const TripForm = {
               </select>
             </div>
             <div class="form-field col-span-2">
+              <label class="form-label">Trip type <span class="required">*</span></label>
+              <select class="form-select" name="tripType" required>
+                ${Schema.TripType.map(t =>
+                  `<option value="${t}" ${(trip.tripType || 'international') === t ? 'selected' : ''}>${Fmt.capitalize(t)}</option>`
+                ).join('')}
+              </select>
+            </div>
+            <div class="form-field col-span-2">
               <label class="form-label">Trip name <span class="required">*</span></label>
               <input class="form-input" name="name" value="${escapeHtml(trip.name)}" required>
             </div>
@@ -128,6 +136,7 @@ const TripForm = {
         destination: fd.get('destination').trim(),
         description: fd.get('description').trim(),
         status: fd.get('status'),
+        tripType: fd.get('tripType') || 'international',
         startDate: fd.get('startDate'),
         endDate: fd.get('endDate'),
         seatsTotal: parseInt(fd.get('seatsTotal')) || 0,

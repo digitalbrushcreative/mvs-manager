@@ -15,6 +15,7 @@ const Router = (function() {
     bookings: { render: (root) => BookingsPage.render(root), label: 'Bookings', action: { label: 'New booking', icon: '+', fn: () => BookingForm.open() } },
     activities: { render: (root) => ActivitiesPage.render(root), label: 'Activities', action: { label: 'Add activity', icon: '+', fn: () => ActivityForm.open() } },
     communications: { render: (root) => CommunicationsPage.render(root), label: 'Messages', action: { label: 'Compose', icon: '+', fn: () => CommunicationsPage._compose?.() || Router._composeCallback?.() } },
+    interest: { render: (root) => InterestPage.render(root), label: 'Interest', action: null },
     reports: { render: (root) => ReportsPage.render(root), label: 'Reports', action: null }
   };
 
@@ -75,6 +76,13 @@ const Router = (function() {
     const stats = Store.tripStats(trip.id);
     const rosterCount = $('#rosterCount');
     if (rosterCount && stats) rosterCount.textContent = stats.enrolled;
+    const interestCount = $('#interestCount');
+    if (interestCount) {
+      const active = Store.getInterests(trip.id).filter(i =>
+        ['new', 'contacted', 'awaiting-details', 'submitted'].includes(i.status)
+      ).length;
+      interestCount.textContent = active;
+    }
   }
 
   function init() {
@@ -93,6 +101,7 @@ const Router = (function() {
       bookings: ['bookings', 'activeTrip', 'trips'],
       activities: ['activities', 'activeTrip', 'trips'],
       communications: ['communications', 'pupils', 'activeTrip'],
+      interest: ['interests', 'activeTrip', 'trips', 'pupils'],
       reports: ['activeTrip', 'trips']
     };
 

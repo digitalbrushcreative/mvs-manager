@@ -341,6 +341,53 @@ const Store = (function () {
     return msg;
   }
 
+  // ----- INTERESTS (parent-submitted pre-trip interest) -----
+  function getInterests(tripId = null) {
+    const all = Storage.get(StorageKeys.INTERESTS, []);
+    return tripId ? all.filter(i => i.tripId === tripId) : all;
+  }
+  function getInterest(id) {
+    return Storage.get(StorageKeys.INTERESTS, []).find(i => i.id === id);
+  }
+  function updateInterest(id, patch) {
+    const all = Storage.get(StorageKeys.INTERESTS, []);
+    const idx = all.findIndex(i => i.id === id);
+    if (idx === -1) return null;
+    all[idx] = { ...all[idx], ...patch, updatedAt: new Date().toISOString() };
+    Storage.set(StorageKeys.INTERESTS, all);
+    notify('interests');
+    return all[idx];
+  }
+  function deleteInterest(id) {
+    const remaining = Storage.get(StorageKeys.INTERESTS, []).filter(i => i.id !== id);
+    Storage.set(StorageKeys.INTERESTS, remaining);
+    notify('interests');
+  }
+
+  // Convert an interest into a real pupil + mark interest converted.
+  function convertInterestToPupil(interestId, extra = {}) {
+    const interest = getInterest(interestId);
+    if (!interest) return null;
+    const nameParts = (interest.pupilName || '').trim().split(/\s+/);
+    const firstName = nameParts.shift() || '';
+    const lastName = nameParts.join(' ');
+    const pupil = createPupil({
+      tripId: interest.tripId,
+      firstName, lastName,
+      grade: interest.pupilGrade || 6,
+      guardianName: interest.parentName,
+      guardianPhone: interest.parentPhone,
+      guardianEmail: interest.parentEmail,
+      dob: interest.dob || null,
+      medicalNotes: interest.medicalNotes || '',
+      dietaryNotes: interest.dietaryNotes || '',
+      note: interest.additionalNotes || interest.note || '',
+      ...extra
+    });
+    updateInterest(interestId, { status: 'converted', convertedPupilId: pupil.id });
+    return pupil;
+  }
+
   // ----- COMPUTED STATS -----
   function tripStats(tripId = null) {
     const id = tripId || activeTripId();
@@ -401,6 +448,7 @@ const Store = (function () {
     getBookings, getBooking, createBooking, updateBooking, deleteBooking,
     getActivities, getActivity, createActivity, updateActivity, deleteActivity,
     getCommunications, createCommunication,
+    getInterests, getInterest, updateInterest, deleteInterest, convertInterestToPupil,
     tripStats
   };
 })();

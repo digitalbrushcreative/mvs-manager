@@ -12,6 +12,7 @@ const ALLOWED_KEYS = new Set([
   'mvs-trips:activities',
   'mvs-trips:communications',
   'mvs-trips:document-types',
+  'mvs-trips:interests',
   'mvs-trips:settings',
   'mvs-trips:seeded'
 ]);

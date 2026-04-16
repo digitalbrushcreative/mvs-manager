@@ -21,6 +21,7 @@ const StorageKeys = {
   ACTIVITIES: 'mvs-trips:activities',
   COMMUNICATIONS: 'mvs-trips:communications',
   DOCUMENT_TYPES: 'mvs-trips:document-types',
+  INTERESTS: 'mvs-trips:interests',
   SETTINGS: 'mvs-trips:settings',
   SEEDED: 'mvs-trips:seeded',
 };

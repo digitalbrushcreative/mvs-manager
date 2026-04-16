@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upcoming Trips · Mountain View School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="parent.css">
+</head>
+<body>
+
+<header class="parent-header">
+  <div class="parent-header-inner">
+    <div class="parent-brand">
+      <div class="crest">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="18" fill="none" stroke="#2c3f6b" stroke-width="1"/>
+          <circle cx="20" cy="20" r="16" fill="none" stroke="#2c3f6b" stroke-width="0.4"/>
+          <path d="M 7 24 L 13 14 L 17 19 L 22 10 L 28 18 L 33 24 Z" fill="#2c3f6b"/>
+          <path d="M 7 24 L 33 24 L 33 26 L 7 26 Z" fill="#2c3f6b"/>
+          <circle cx="26" cy="13" r="2" fill="#d4a84b"/>
+        </svg>
+      </div>
+      <div class="parent-brand-text">
+        <span class="line1">Mountain View School</span>
+        <span class="line2">Field Trips · Parents</span>
+      </div>
+    </div>
+    <a class="parent-admin-link" href="../index.html">Staff portal →</a>
+  </div>
+</header>
+
+<main class="parent-main">
+  <section class="parent-hero">
+    <h1>Upcoming field trips</h1>
+    <p>Browse the trips we're running next and register your interest. We'll follow up with full details and document requests closer to the trip date.</p>
+  </section>
+
+  <section id="tripsRoot" class="trips-grid" aria-busy="true">
+    <div class="loading">Loading trips…</div>
+  </section>
+</main>
+
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script src="../js/utils/dom.js"></script>
+<script src="../js/utils/format.js"></script>
+<script src="../js/utils/toast.js"></script>
+<script src="../js/modals/modal.js"></script>
+<script src="parent.js"></script>
+</body>
+</html>

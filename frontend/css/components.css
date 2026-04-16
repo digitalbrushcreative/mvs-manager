@@ -525,6 +525,8 @@
   font-weight: 600;
   letter-spacing: 0.08em;
 }
+.banner-eyebrow .badge-international { background: #2c3f6b; }
+.banner-eyebrow .badge-local { background: #5a8a3d; }
 .banner-eyebrow .sep { opacity: 0.4; }
 
 h1.banner-title {

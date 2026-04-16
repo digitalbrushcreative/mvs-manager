@@ -15,6 +15,7 @@ const Schema = {
   ActivityType: ['included', 'ticketed', 'optional'],
   CommType: ['email', 'sms', 'whatsapp', 'letter'],
   TripStatus: ['draft', 'open', 'closed', 'in-progress', 'complete', 'cancelled'],
+  TripType: ['local', 'international'],
 
   // ----- Factories -----
   newTrip(overrides = {}) {
@@ -26,6 +27,7 @@ const Schema = {
       startDate: null,
       endDate: null,
       status: 'draft',
+      tripType: 'international',
       gradesAllowed: [6, 7, 8, 9],
       seatsTotal: 40,
       costPerPupil: 0,
