@@ -1,0 +1,16 @@
+{
+  "name": "mvs-manager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MVS Field Trips — field trip management SPA with Express/SQLite backend",
+  "scripts": {
+    "install:all": "npm install && npm --prefix backend install",
+    "dev": "concurrently -n api,web -c blue,green \"npm --prefix backend run dev\" \"npm run dev:web\"",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:web": "npx --yes http-server frontend -p 8000 -c-1 -o",
+    "start": "concurrently -n api,web -c blue,green \"npm --prefix backend start\" \"npm run dev:web\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

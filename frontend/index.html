@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Trips · Mountain View School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/modals.css">
+</head>
+<body>
+
+<!-- ============ TOP SCHOOL NAV ============ -->
+<nav class="topnav">
+  <div class="topnav-brand">
+    <div class="crest">
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#2c3f6b" stroke-width="1"/>
+        <circle cx="20" cy="20" r="16" fill="none" stroke="#2c3f6b" stroke-width="0.4"/>
+        <path d="M 7 24 L 13 14 L 17 19 L 22 10 L 28 18 L 33 24 Z" fill="#2c3f6b"/>
+        <path d="M 7 24 L 33 24 L 33 26 L 7 26 Z" fill="#2c3f6b"/>
+        <circle cx="26" cy="13" r="2" fill="#d4a84b"/>
+      </svg>
+    </div>
+    <div class="brand-wordmark">
+      <span class="line1">Mountain View</span>
+      <span class="line2">School · Est 1985</span>
+    </div>
+  </div>
+
+  <div class="topnav-primary">
+    <div class="topnav-item">Home</div>
+    <div class="topnav-item">Academics</div>
+    <div class="topnav-item">Admissions</div>
+    <div class="topnav-item active">Student Life</div>
+    <div class="topnav-item">Finance</div>
+    <div class="topnav-item">Staff</div>
+    <div class="topnav-item">Reports</div>
+  </div>
+
+  <div class="topnav-right">
+    <div class="topnav-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="globalSearch" placeholder="Search pupils, trips, payments…">
+    </div>
+    <button class="nav-icon-btn" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="dot"></span>
+    </button>
+    <button class="nav-icon-btn" title="Messages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <div class="user-chip">
+      <div class="avatar">RM</div>
+      <span class="name">Reginah M.</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ SUB NAV (Field Trips module) ============ -->
+<nav class="subnav">
+  <div class="subnav-title">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8c0 4.5-6 10-6 10S6 12.5 6 8a6 6 0 0 1 12 0Z"/><circle cx="12" cy="8" r="2"/></svg>
+    </div>
+    <span class="label">Field Trips</span>
+  </div>
+
+  <div class="subnav-items" id="subnavItems">
+    <div class="subnav-item" data-page="dashboard">Dashboard</div>
+    <div class="subnav-item active" data-page="roster">Roster <span class="count" id="rosterCount">0</span></div>
+    <div class="subnav-item" data-page="itinerary">Itinerary</div>
+    <div class="subnav-item" data-page="payments">Payments</div>
+    <div class="subnav-item" data-page="documents">Documents</div>
+    <div class="subnav-item" data-page="bookings">Bookings</div>
+    <div class="subnav-item" data-page="activities">Activities</div>
+    <div class="subnav-item" data-page="communications">Messages</div>
+    <div class="subnav-item" data-page="reports">Reports</div>
+  </div>
+
+  <button class="btn btn-primary subnav-action" id="subnavAction">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    <span>New trip</span>
+  </button>
+</nav>
+
+<!-- ============ PAGE ROOT ============ -->
+<main id="pageRoot" class="page"></main>
+
+<!-- ============ MODAL ROOT ============ -->
+<div id="modalRoot"></div>
+
+<!-- ============ TOAST ROOT ============ -->
+<div id="toastRoot"></div>
+
+<!-- ============ SCRIPTS ============ -->
+<script src="js/utils/dom.js"></script>
+<script src="js/utils/format.js"></script>
+<script src="js/utils/storage.js"></script>
+<script src="js/utils/toast.js"></script>
+
+<script src="js/data/seed.js"></script>
+<script src="js/data/schema.js"></script>
+<script src="js/data/store.js"></script>
+
+<script src="js/components/chips.js"></script>
+<script src="js/components/kpi.js"></script>
+<script src="js/components/table.js"></script>
+<script src="js/components/banner.js"></script>
+
+<script src="js/modals/modal.js"></script>
+<script src="js/modals/pupilForm.js"></script>
+<script src="js/modals/paymentForm.js"></script>
+<script src="js/modals/documentForm.js"></script>
+<script src="js/modals/bookingForm.js"></script>
+<script src="js/modals/activityForm.js"></script>
+<script src="js/modals/tripForm.js"></script>
+<script src="js/modals/pupilDetail.js"></script>
+<script src="js/modals/confirm.js"></script>
+
+<script src="js/pages/dashboard.js"></script>
+<script src="js/pages/roster.js"></script>
+<script src="js/pages/itinerary.js"></script>
+<script src="js/pages/payments.js"></script>
+<script src="js/pages/documents.js"></script>
+<script src="js/pages/bookings.js"></script>
+<script src="js/pages/activities.js"></script>
+<script src="js/pages/communications.js"></script>
+<script src="js/pages/reports.js"></script>
+
+<script src="js/router.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

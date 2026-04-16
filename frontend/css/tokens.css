@@ -1,0 +1,58 @@
+/* ==========================================
+   DESIGN TOKENS — Mountain View School
+   ========================================== */
+
+:root {
+  /* Brand palette */
+  --navy: #2c3f6b;
+  --navy-deep: #1f2e54;
+  --navy-darker: #16213f;
+  --navy-soft: #4a5d8a;
+  --crimson: #c8202b;
+  --crimson-deep: #a6171f;
+  --crimson-soft: #fae6e7;
+  --gold: #d4a84b;
+  --gold-soft: #faf1dc;
+
+  /* Neutrals */
+  --white: #ffffff;
+  --off-white: #f7f8fb;
+  --grey-50: #f1f3f8;
+  --grey-100: #e5e8ef;
+  --grey-200: #d1d6e0;
+  --grey-300: #b0b7c4;
+  --grey-400: #8891a3;
+  --grey-500: #5f6879;
+  --grey-700: #394050;
+  --grey-900: #1a1f2b;
+
+  /* Semantic */
+  --success: #2d7d46;
+  --success-soft: #e3f0e6;
+  --warning: #c17817;
+  --warning-soft: #fbefd8;
+  --danger: var(--crimson);
+  --danger-soft: var(--crimson-soft);
+  --info: #2c5a8a;
+  --info-soft: #dfeaf5;
+
+  /* Typography */
+  --display: 'Montserrat', sans-serif;
+  --sans: 'Open Sans', -apple-system, sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(22, 33, 63, 0.04);
+  --shadow-md: 0 1px 3px rgba(22, 33, 63, 0.06), 0 2px 8px rgba(22, 33, 63, 0.04);
+  --shadow-lg: 0 4px 12px rgba(22, 33, 63, 0.08), 0 8px 32px rgba(22, 33, 63, 0.06);
+  --shadow-modal: 0 20px 60px rgba(22, 33, 63, 0.25);
+
+  /* Radius */
+  --r-sm: 3px;
+  --r-md: 5px;
+  --r-lg: 8px;
+
+  /* Transitions */
+  --t-fast: 120ms ease;
+  --t-med: 180ms ease;
+}
