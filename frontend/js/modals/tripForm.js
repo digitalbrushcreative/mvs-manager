@@ -124,7 +124,10 @@ const TripForm = {
     });
 
     function save() {
-      const form = body.querySelector('#tripFormEl');
+      // `body` is the <form> element itself (html` ` returns the first
+      // element child of the template). querySelector on the form only
+      // searches descendants, so we use `body` directly.
+      const form = body.id === 'tripFormEl' ? body : body.querySelector('#tripFormEl');
       const fd = new FormData(form);
       const val = (k) => (fd.get(k) ?? '').toString();
 
