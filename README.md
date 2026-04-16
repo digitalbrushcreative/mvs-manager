@@ -59,25 +59,35 @@ npm run dev:web     # http://localhost:8000
 
 Base URL: `http://localhost:3001/api`
 
-| Method | Path                       | Notes                              |
-|--------|----------------------------|------------------------------------|
-| GET    | `/health`                  | liveness check                     |
-| GET    | `/trips`                   |                                    |
-| GET    | `/trips/:id`               |                                    |
-| POST   | `/trips`                   |                                    |
-| PATCH  | `/trips/:id`               | merges into existing record        |
-| DELETE | `/trips/:id`               | cascades to pupils and payments    |
-| GET    | `/pupils?tripId=...`       |                                    |
-| POST   | `/pupils`                  | `tripId` required                  |
-| PATCH  | `/pupils/:id`              |                                    |
-| DELETE | `/pupils/:id`              |                                    |
-| GET    | `/payments?tripId=&pupilId=` |                                  |
-| POST   | `/payments`                | `tripId` and `pupilId` required    |
-| DELETE | `/payments/:id`            |                                    |
+The backend is a **key-value store** — each collection (trips, pupils, payments, documents, bookings, activities, communications, documentTypes, settings) is persisted as a single JSON blob keyed by its storage key. This mirrors the frontend's in-memory cache model, so `store.js` needs no changes.
+
+| Method | Path                  | Notes                                      |
+|--------|-----------------------|--------------------------------------------|
+| GET    | `/health`             | liveness check                             |
+| GET    | `/store/bootstrap`    | returns `{ key: value }` for all keys      |
+| GET    | `/store/:key`         | one collection                             |
+| PUT    | `/store/:key`         | replace the collection (body is the value) |
+| DELETE | `/store/:key`         | remove one collection                      |
+| POST   | `/store/clear`        | wipe all collections                       |
+
+Allowed keys are enumerated in [backend/src/routes/store.js](backend/src/routes/store.js).
 
 ## Frontend architecture
 
-Everything is a global in the browser — no modules, no bundler, no framework. Load order matters and is controlled by the `<script>` tags in `frontend/index.html`. Data currently lives in `localStorage` under the `mvs-trips:*` namespace. Pages subscribe to `Store` changes via pub/sub and re-render when their domain changes.
+Everything is a global in the browser — no modules, no bundler, no framework. Load order matters and is controlled by the `<script>` tags in `frontend/index.html`. Pages subscribe to `Store` changes via pub/sub and re-render when their domain changes.
+
+### Data flow
+
+```
+  [Store]  ──get/set──►  [Storage cache]  ──debounced PUT──►  [API]  ──►  [SQLite]
+    ▲                          ▲
+    │                          │ bootstrap() on load hydrates from API
+    └── subscribe/notify ──────┘
+```
+
+- **Reads** stay synchronous — served from the in-memory cache that was hydrated at boot.
+- **Writes** update the cache immediately (so pages re-render instantly) and schedule a debounced `PUT /api/store/:key` (150 ms) — multiple rapid writes to the same key coalesce into one request.
+- **Bootstrap** — `app.js` awaits `Storage.bootstrap()` before rendering; the cache is populated from `GET /api/store/bootstrap`.
 
 ### Store (`frontend/js/data/store.js`)
 
@@ -90,10 +100,6 @@ Store.updatePupil(id, { paymentStatus: 'paid' })
 Store.createPayment({ pupilId, amount, method })
 Store.subscribe('pupils', () => renderRoster());
 ```
-
-### Wiring the frontend to the backend
-
-The frontend still reads/writes `localStorage`. To migrate, replace the `Storage.get/set` calls inside `store.js` with `fetch()` calls to the API. Keep the pub/sub layer untouched — pages won't know the difference.
 
 ## Keyboard shortcuts
 

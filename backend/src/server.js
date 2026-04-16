@@ -5,13 +5,11 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '10mb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'mvs-manager-api' }));
 
-app.use('/api/trips', require('./routes/trips'));
-app.use('/api/pupils', require('./routes/pupils'));
-app.use('/api/payments', require('./routes/payments'));
+app.use('/api/store', require('./routes/store'));
 
 app.use((err, _req, res, _next) => {
   console.error(err);

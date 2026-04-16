@@ -1,9 +1,14 @@
 /* ==========================================
-   PERSISTENCE — localStorage wrapper
+   PERSISTENCE — in-memory cache synced to backend
    ==========================================
-   Provides a safe, namespaced API over localStorage.
-   All state lives under the `mvs-trips` root key,
-   with sub-keys for each collection.
+   Reads are synchronous (served from cache); writes
+   update the cache immediately and fire a debounced
+   PUT to the API. On the very first call, Storage.bootstrap()
+   must be awaited so the cache is populated before pages render.
+
+   The keys and method signatures are unchanged from the
+   original localStorage-backed version, so Store.js needs
+   no modifications.
 */
 
 const StorageKeys = {
@@ -20,53 +25,70 @@ const StorageKeys = {
   SEEDED: 'mvs-trips:seeded',
 };
 
-const Storage = {
-  get(key, fallback = null) {
-    try {
-      const raw = localStorage.getItem(key);
-      return raw === null ? fallback : JSON.parse(raw);
-    } catch (err) {
-      console.warn('[Storage.get]', key, err);
-      return fallback;
-    }
-  },
+const Storage = (function () {
+  const cache = new Map();
+  const pending = new Map(); // key -> timeout id (debounce)
+  const DEBOUNCE_MS = 150;
+  let booted = false;
 
-  set(key, value) {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-      return true;
-    } catch (err) {
-      console.warn('[Storage.set]', key, err);
-      return false;
-    }
-  },
+  function scheduleWrite(key, value) {
+    if (pending.has(key)) clearTimeout(pending.get(key));
+    pending.set(key, setTimeout(() => {
+      pending.delete(key);
+      Api.put(key, value).catch(err => {
+        console.warn('[Storage] PUT failed for', key, err);
+        if (typeof Toast !== 'undefined') Toast.error('Could not save to server');
+      });
+    }, DEBOUNCE_MS));
+  }
 
-  remove(key) {
-    localStorage.removeItem(key);
-  },
+  async function bootstrap() {
+    const remote = await Api.bootstrap();
+    cache.clear();
+    for (const [k, v] of Object.entries(remote || {})) cache.set(k, v);
+    booted = true;
+  }
 
-  clear() {
-    Object.values(StorageKeys).forEach(k => localStorage.removeItem(k));
-  },
+  function get(key, fallback = null) {
+    if (!booted) console.warn('[Storage.get] called before bootstrap:', key);
+    return cache.has(key) ? cache.get(key) : fallback;
+  }
 
-  /** Replace this app's entire dataset with `data`. */
-  import(data) {
-    try {
-      Object.entries(data).forEach(([k, v]) => Storage.set(k, v));
-      return true;
-    } catch (err) {
-      console.error('[Storage.import]', err);
-      return false;
-    }
-  },
+  function set(key, value) {
+    cache.set(key, value);
+    scheduleWrite(key, value);
+    return true;
+  }
 
-  /** Export full dataset for backup. */
-  export() {
+  function remove(key) {
+    cache.delete(key);
+    if (pending.has(key)) { clearTimeout(pending.get(key)); pending.delete(key); }
+    Api.remove(key).catch(err => console.warn('[Storage.remove]', key, err));
+  }
+
+  function clear() {
+    cache.clear();
+    pending.forEach(id => clearTimeout(id));
+    pending.clear();
+    return Api.clear();
+  }
+
+  function importData(data) {
+    Object.entries(data).forEach(([k, v]) => set(k, v));
+    return true;
+  }
+
+  function exportData() {
     const out = {};
-    Object.values(StorageKeys).forEach(k => {
-      const v = Storage.get(k);
-      if (v !== null) out[k] = v;
-    });
+    for (const [k, v] of cache.entries()) out[k] = v;
     return out;
   }
-};
+
+  return {
+    bootstrap,
+    get, set, remove, clear,
+    import: importData,
+    export: exportData,
+    isBooted: () => booted
+  };
+})();

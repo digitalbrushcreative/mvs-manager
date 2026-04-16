@@ -5,8 +5,17 @@
    wires global UI, and boots the router.
 */
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Seed data on first visit
+document.addEventListener('DOMContentLoaded', async () => {
+  // Hydrate the in-memory cache from the API before anything reads data.
+  try {
+    await Storage.bootstrap();
+  } catch (err) {
+    console.error('[bootstrap] API unreachable:', err);
+    Toast.error('Could not reach API at ' + (window.MVS_API_BASE || 'http://localhost:3001'));
+    return;
+  }
+
+  // Seed data on first visit (writes go through Storage → API)
   Seed.seedIfNeeded();
 
   // Initialize router & show default page
@@ -56,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'Reset all data?',
         message: 'This will delete everything and restore the seed dataset. This cannot be undone.',
         confirmLabel: 'Reset',
-        onConfirm: () => {
-          Storage.clear();
+        onConfirm: async () => {
+          await Storage.clear();
           Seed.seedIfNeeded(true);
           Toast.success('Data reset');
           Router.go('roster');
