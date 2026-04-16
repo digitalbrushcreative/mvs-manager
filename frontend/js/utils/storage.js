@@ -34,12 +34,21 @@ const Storage = (function () {
 
   function scheduleWrite(key, value) {
     if (pending.has(key)) clearTimeout(pending.get(key));
-    pending.set(key, setTimeout(() => {
+    pending.set(key, setTimeout(async () => {
       pending.delete(key);
-      Api.put(key, value).catch(err => {
-        console.warn('[Storage] PUT failed for', key, err);
-        if (typeof Toast !== 'undefined') Toast.error('Could not save to server');
-      });
+      try {
+        await Api.put(key, value);
+      } catch (firstErr) {
+        console.warn('[Storage] PUT failed (will retry once)', key, firstErr);
+        // Retry once — common cause is a transient network blip during backend hot-reload.
+        try {
+          await new Promise(r => setTimeout(r, 300));
+          await Api.put(key, value);
+        } catch (err) {
+          console.error('[Storage] PUT failed permanently for', key, err);
+          if (typeof Toast !== 'undefined') Toast.error('Could not save to server: ' + key.replace('mvs-trips:', ''));
+        }
+      }
     }, DEBOUNCE_MS));
   }
 
