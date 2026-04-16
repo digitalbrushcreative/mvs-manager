@@ -109,7 +109,7 @@ const PaymentForm = {
     });
 
     function save() {
-      const form = body.querySelector('#paymentFormEl');
+      const form = body.id === 'paymentFormEl' ? body : body.querySelector('#paymentFormEl');
       const fd = new FormData(form);
 
       if (!fd.get('pupilId') && !pupilId) {

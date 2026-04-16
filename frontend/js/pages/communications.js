@@ -510,7 +510,9 @@ const CommunicationsPage = (function() {
     });
 
     function send() {
-      const form = body.querySelector('#composeFormEl');
+      // `body` is the <form> element itself (html` ` returns the first
+      // element child), so query it directly.
+      const form = body.id === 'composeFormEl' ? body : body.querySelector('#composeFormEl');
       const fd = new FormData(form);
       const subject = (fd.get('subject') || '').toString().trim();
       const template = (fd.get('body') || '').toString().trim();

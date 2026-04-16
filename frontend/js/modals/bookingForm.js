@@ -149,7 +149,7 @@ const BookingForm = {
     });
 
     function save() {
-      const form = body.querySelector('#bookingFormEl');
+      const form = body.id === 'bookingFormEl' ? body : body.querySelector('#bookingFormEl');
       const fd = new FormData(form);
       if (!fd.get('title').trim()) { Toast.error('Title is required'); return; }
 

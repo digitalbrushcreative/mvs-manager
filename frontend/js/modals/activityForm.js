@@ -83,7 +83,7 @@ const ActivityForm = {
     });
 
     function save() {
-      const form = body.querySelector('#actFormEl');
+      const form = body.id === 'actFormEl' ? body : body.querySelector('#actFormEl');
       const fd = new FormData(form);
       if (!fd.get('title').trim()) { Toast.error('Title is required'); return; }
 

@@ -84,7 +84,7 @@ const DocumentForm = {
     });
 
     function save() {
-      const form = body.querySelector('#docFormEl');
+      const form = body.id === 'docFormEl' ? body : body.querySelector('#docFormEl');
       const fd = new FormData(form);
       const data = {
         pupilId: fd.get('pupilId') || doc.pupilId,

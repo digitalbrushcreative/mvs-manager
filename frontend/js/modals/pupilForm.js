@@ -132,7 +132,7 @@ const PupilForm = {
     });
 
     function save() {
-      const form = body.querySelector('#pupilFormEl');
+      const form = body.id === 'pupilFormEl' ? body : body.querySelector('#pupilFormEl');
       const fd = new FormData(form);
 
       // Validation
