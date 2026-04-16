@@ -286,7 +286,55 @@ const Seed = {
       { id: 'msg_4', tripId, type: 'sms', subject: 'Document reminder', body: 'Please submit passport copies by 15 March. Upload via parent portal.', recipientIds: [], recipientCount: 24, sentAt: '2026-03-08T08:00:00Z', sentBy: 'Trips Coordinator' }
     ];
 
-    return { trips, pupils, documents, payments, activities, bookings, communications, documentTypes };
+    // Demo accounts. Dev-only — plain-text passwords, localhost only.
+    // The parent is linked to the first two seeded pupils and has an active interest.
+    const linkedPupilIds = pupils.slice(0, 2).map(p => p.id);
+    const users = [
+      {
+        id: 'user_admin',
+        email: 'admin@mvs.test',
+        password: 'admin123',
+        role: 'admin',
+        name: 'Trips Coordinator',
+        linkedPupilIds: [],
+        linkedInterestTokens: []
+      },
+      {
+        id: 'user_parent',
+        email: 'parent@example.com',
+        password: 'parent123',
+        role: 'parent',
+        name: pupils[0] ? `${pupils[0].guardianName}` : 'Parent',
+        linkedPupilIds,
+        linkedInterestTokens: []  // populated when they submit via the brochure
+      }
+    ];
+
+    const interests = [
+      {
+        id: 'int_seed_1',
+        token: 'demo-parent-interest-token',
+        tripId: 'trip_coast_2026',
+        parentName: users[1].name,
+        parentPhone: '0710-000-001',
+        parentEmail: users[1].email,
+        pupilName: 'Sibling Student',
+        pupilGrade: 5,
+        note: 'Interested in the Coast trip for our younger child.',
+        dob: null,
+        medicalNotes: '',
+        dietaryNotes: '',
+        additionalNotes: '',
+        documentsRequested: [],
+        documentsSubmitted: [],
+        status: 'new',
+        submittedAt: new Date(2026, 3, 10).toISOString(),
+        updatedAt: new Date(2026, 3, 10).toISOString()
+      }
+    ];
+    users[1].linkedInterestTokens = [interests[0].token];
+
+    return { trips, pupils, documents, payments, activities, bookings, communications, documentTypes, users, interests };
   },
 
   seedIfNeeded(force = false) {
@@ -300,6 +348,8 @@ const Seed = {
     Storage.set(StorageKeys.BOOKINGS, data.bookings);
     Storage.set(StorageKeys.COMMUNICATIONS, data.communications);
     Storage.set(StorageKeys.DOCUMENT_TYPES, data.documentTypes);
+    Storage.set(StorageKeys.USERS, data.users);
+    Storage.set(StorageKeys.INTERESTS, data.interests);
     Storage.set(StorageKeys.SETTINGS, {
       activeTripId: 'trip_malaysia_2026',
       currency: 'USD',

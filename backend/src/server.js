@@ -13,6 +13,7 @@ app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'mvs-manager
 
 app.use('/api/store', require('./routes/store'));
 app.use('/api/public', require('./routes/public'));
+app.use('/api/auth', require('./routes/auth'));
 
 app.use((err, _req, res, _next) => {
   console.error(err);

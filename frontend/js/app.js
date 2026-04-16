@@ -18,6 +18,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Seed data on first visit (writes go through Storage → API)
   Seed.seedIfNeeded();
 
+  // Admin session guard — runs after seed so demo accounts exist on first visit.
+  const session = JSON.parse(localStorage.getItem('mvs-session') || 'null');
+  if (!session?.token || session.user?.role !== 'admin') {
+    location.replace('login.html');
+    return;
+  }
+  // Show the logged-in user and wire logout.
+  const user = session.user;
+  const avatar = document.getElementById('userAvatar');
+  const nameEl = document.getElementById('userName');
+  if (avatar) avatar.textContent = (user.name || user.email).split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase();
+  if (nameEl) nameEl.textContent = user.name || user.email;
+  const userChip = document.getElementById('userChip');
+  if (userChip) userChip.addEventListener('click', async () => {
+    try {
+      await fetch((window.MVS_API_BASE || 'http://localhost:3001') + '/api/auth/logout', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + session.token }
+      });
+    } catch {}
+    localStorage.removeItem('mvs-session');
+    location.replace('login.html');
+  });
+
   // Initialize router & show default page
   Router.init();
   Router.go('roster');
