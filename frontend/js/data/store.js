@@ -10,13 +10,17 @@ const Store = (function () {
 
   function notify(collection) {
     const set = listeners.get(collection);
-    if (!set) return;
-    set.forEach(cb => {
-      try { cb(); } catch (e) { console.error(e); }
-    });
-    // Global
+    if (set) {
+      set.forEach(cb => {
+        try { cb(); } catch (e) { console.error('[Store.notify]', collection, e); }
+      });
+    }
     const all = listeners.get('*');
-    if (all) all.forEach(cb => cb(collection));
+    if (all) {
+      all.forEach(cb => {
+        try { cb(collection); } catch (e) { console.error('[Store.notify *]', collection, e); }
+      });
+    }
   }
 
   function subscribe(collection, callback) {

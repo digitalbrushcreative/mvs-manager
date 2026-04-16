@@ -126,32 +126,41 @@ const TripForm = {
     function save() {
       const form = body.querySelector('#tripFormEl');
       const fd = new FormData(form);
-      if (!fd.get('code').trim() || !fd.get('name').trim() || !fd.get('destination').trim() || !fd.get('startDate') || !fd.get('endDate')) {
+      const val = (k) => (fd.get(k) ?? '').toString();
+
+      if (!val('code').trim() || !val('name').trim() || !val('destination').trim() || !val('startDate') || !val('endDate')) {
         Toast.error('Fill required fields');
         return;
       }
+
       const data = {
-        code: fd.get('code').trim(),
-        name: fd.get('name').trim(),
-        destination: fd.get('destination').trim(),
-        description: fd.get('description').trim(),
-        status: fd.get('status'),
-        tripType: fd.get('tripType') || 'international',
-        startDate: fd.get('startDate'),
-        endDate: fd.get('endDate'),
-        seatsTotal: parseInt(fd.get('seatsTotal')) || 0,
-        chaperones: parseInt(fd.get('chaperones')) || 0,
-        costPerPupil: parseFloat(fd.get('costPerPupil')) || 0,
-        currency: fd.get('currency')
+        code: val('code').trim(),
+        name: val('name').trim(),
+        destination: val('destination').trim(),
+        description: val('description').trim(),
+        status: val('status') || 'draft',
+        tripType: val('tripType') || 'international',
+        startDate: val('startDate'),
+        endDate: val('endDate'),
+        seatsTotal: parseInt(val('seatsTotal'), 10) || 0,
+        chaperones: parseInt(val('chaperones'), 10) || 0,
+        costPerPupil: parseFloat(val('costPerPupil')) || 0,
+        currency: val('currency') || 'USD'
       };
 
-      if (isEdit) {
-        Store.updateTrip(tripId, data);
-        Toast.success('Trip updated');
-      } else {
-        const t = Store.createTrip(data);
-        Store.setActiveTrip(t.id);
-        Toast.success('Trip created');
+      try {
+        if (isEdit) {
+          Store.updateTrip(tripId, data);
+          Toast.success('Trip updated');
+        } else {
+          const t = Store.createTrip(data);
+          Store.setActiveTrip(t.id);
+          Toast.success('Trip created');
+        }
+      } catch (err) {
+        console.error('[TripForm] save failed', err);
+        Toast.error('Save failed: ' + (err.message || err));
+        return;
       }
       modal.close();
     }
