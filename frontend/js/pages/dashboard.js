@@ -36,6 +36,8 @@ const DashboardPage = (function() {
       { label: 'Flagged pupils', value: Store.getPupils().filter(p => p.flagged).length, accent: 'crimson', sub: 'across all trips' },
     ]));
 
+    root.appendChild(renderInsights(trips, activeTrip));
+
     // Main grid
     const grid = html`
       <div class="dash-grid">
@@ -139,6 +141,176 @@ const DashboardPage = (function() {
       btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--grey-100)'; btn.style.background = 'var(--off-white)'; });
       qa.appendChild(btn);
     });
+  }
+
+  function renderInsights(trips, activeTrip) {
+    const wrapper = html`<div class="insights-section"></div>`;
+    wrapper.appendChild(html`
+      <div class="insights-head">
+        <h2 class="insights-title">Trip performance</h2>
+        <div class="insights-sub">Live across ${trips.length} trip${trips.length === 1 ? '' : 's'} · showing ${activeTrip ? activeTrip.code : 'no active trip'} below</div>
+      </div>
+    `);
+
+    if (!trips.length) {
+      wrapper.appendChild(html`<div class="empty-state"><h3>Nothing to show</h3><p>Create a trip to see performance insights.</p></div>`);
+      return wrapper;
+    }
+
+    const grid = html`<div class="insights-grid"></div>`;
+
+    // --- Collection progress (active trip) ---
+    if (activeTrip) {
+      const stats = Store.tripStats(activeTrip.id);
+      const cur = activeTrip.currency === 'KES' ? 'KSh' : activeTrip.currency === 'GBP' ? '£' : activeTrip.currency === 'EUR' ? '€' : '$';
+      const card1 = chartCard(
+        `Collection progress — ${activeTrip.code}`,
+        `${cur}${Math.round(stats.collected).toLocaleString()} of ${cur}${Math.round(stats.totalExpected).toLocaleString()} expected`,
+        Charts.progressRing({
+          pct: stats.percentCollected,
+          label: `${cur}${Math.round(stats.outstanding).toLocaleString()} outstanding`,
+          sub: `${stats.byStatus.paid} paid · ${stats.byStatus.deposit} on deposit · ${stats.byStatus.pending} pending · ${stats.byStatus.overdue} overdue`,
+          color: stats.percentCollected >= 0.8 ? 'var(--success)' : stats.percentCollected >= 0.4 ? 'var(--warning)' : 'var(--crimson)'
+        })
+      );
+      grid.appendChild(card1);
+
+      // --- Payment status donut ---
+      const card2 = chartCard(
+        'Payment status',
+        `${stats.enrolled} pupils enrolled`,
+        Charts.donut({
+          segments: [
+            { label: 'Paid',    value: stats.byStatus.paid,    color: 'var(--success)' },
+            { label: 'Deposit', value: stats.byStatus.deposit, color: 'var(--info)' },
+            { label: 'Pending', value: stats.byStatus.pending, color: 'var(--warning)' },
+            { label: 'Overdue', value: stats.byStatus.overdue, color: 'var(--crimson)' }
+          ],
+          centerLabel: 'pupils',
+          centerValue: stats.enrolled
+        })
+      );
+      grid.appendChild(card2);
+
+      // --- Document compliance donut ---
+      const docs = Store.getDocuments(activeTrip.id);
+      const byDocStatus = {
+        verified: docs.filter(d => d.status === 'verified').length,
+        submitted: docs.filter(d => d.status === 'submitted').length,
+        missing: docs.filter(d => d.status === 'missing').length,
+        expired: docs.filter(d => d.status === 'expired' || d.status === 'expiring').length
+      };
+      const card3 = chartCard(
+        'Document compliance',
+        `${Math.round(stats.docCompliance * 100)}% verified of ${docs.length} required`,
+        Charts.donut({
+          segments: [
+            { label: 'Verified',  value: byDocStatus.verified,  color: 'var(--success)' },
+            { label: 'Submitted', value: byDocStatus.submitted, color: 'var(--info)' },
+            { label: 'Missing',   value: byDocStatus.missing,   color: 'var(--crimson)' },
+            { label: 'Expiring',  value: byDocStatus.expired,   color: 'var(--warning)' }
+          ],
+          centerLabel: 'docs',
+          centerValue: docs.length
+        })
+      );
+      grid.appendChild(card3);
+    }
+
+    // --- Capacity across all trips ---
+    const capacityData = trips.map(t => {
+      const s = Store.tripStats(t.id) || {};
+      return {
+        name: `${t.code} — ${t.name}`,
+        capacity: t.seatsTotal || 0,
+        segments: [
+          { label: 'Pupils',     value: s.enrolled || 0,       color: 'var(--navy)' },
+          { label: 'Chaperones', value: t.chaperones || 0,     color: 'var(--gold)' },
+          { label: 'Parents',    value: t.parentsJoining || 0, color: 'var(--info)' }
+        ]
+      };
+    });
+    const cardCap = chartCard(
+      'Seat utilisation — all trips',
+      'Pupils + chaperones + parents vs total seats',
+      Charts.capacityRows(capacityData),
+      'wide'
+    );
+    // Capacity legend
+    cardCap.appendChild(html`
+      <div class="chart-legend chart-legend-horizontal" style="margin-top: 8px;">
+        <div class="legend-row"><span class="legend-dot" style="background:var(--navy);"></span><span class="legend-label">Pupils</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--gold);"></span><span class="legend-label">Chaperones</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--info);"></span><span class="legend-label">Parents</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--grey-100);"></span><span class="legend-label">Empty</span></div>
+      </div>
+    `);
+    grid.appendChild(cardCap);
+
+    // --- Booking status (active trip) ---
+    if (activeTrip) {
+      const bookings = Store.getBookings(activeTrip.id);
+      const byBk = {
+        confirmed: bookings.filter(b => b.status === 'confirmed').length,
+        pending:   bookings.filter(b => b.status === 'pending').length,
+        quoted:    bookings.filter(b => b.status === 'quoted').length,
+        cancelled: bookings.filter(b => b.status === 'cancelled').length
+      };
+      const paidBk = bookings.reduce((s, b) => s + Number(b.paidAmount || 0), 0);
+      const totalBk = bookings.reduce((s, b) => s + Number(b.totalCost || 0), 0);
+      const cardBk = chartCard(
+        'Booking progress',
+        `${bookings.length} bookings · ${Math.round((paidBk / Math.max(totalBk, 1)) * 100)}% committed`,
+        Charts.stackedBar({
+          segments: [
+            { label: 'Confirmed', value: byBk.confirmed, color: 'var(--success)' },
+            { label: 'Pending',   value: byBk.pending,   color: 'var(--warning)' },
+            { label: 'Quoted',    value: byBk.quoted,    color: 'var(--info)' },
+            { label: 'Cancelled', value: byBk.cancelled, color: 'var(--grey-300)' }
+          ]
+        })
+      );
+      grid.appendChild(cardBk);
+
+      // --- Interest funnel (active trip) ---
+      const interests = Store.getInterests(activeTrip.id);
+      const byInt = {
+        new:       interests.filter(i => i.status === 'new').length,
+        contacted: interests.filter(i => i.status === 'contacted').length,
+        awaiting:  interests.filter(i => i.status === 'awaiting-details').length,
+        submitted: interests.filter(i => i.status === 'submitted').length,
+        converted: interests.filter(i => i.status === 'converted').length
+      };
+      const cardInt = chartCard(
+        'Pre-trip interest funnel',
+        `${interests.length} expressions of interest`,
+        Charts.funnel([
+          { label: 'New',               value: byInt.new,       color: 'var(--grey-400)' },
+          { label: 'Contacted',         value: byInt.contacted, color: 'var(--info)' },
+          { label: 'Awaiting details',  value: byInt.awaiting,  color: 'var(--warning)' },
+          { label: 'Details submitted', value: byInt.submitted, color: 'var(--info)' },
+          { label: 'Seat confirmed',    value: byInt.converted, color: 'var(--success)' }
+        ])
+      );
+      grid.appendChild(cardInt);
+    }
+
+    wrapper.appendChild(grid);
+    return wrapper;
+  }
+
+  function chartCard(title, subtitle, chartNode, mod = '') {
+    const card = html`
+      <div class="insight-card ${mod}">
+        <div class="insight-head">
+          <div class="insight-title">${escapeHtml(title)}</div>
+          ${subtitle ? `<div class="insight-sub">${escapeHtml(subtitle)}</div>` : ''}
+        </div>
+        <div class="insight-body"></div>
+      </div>
+    `;
+    card.querySelector('.insight-body').appendChild(chartNode);
+    return card;
   }
 
   function buildAlerts() {

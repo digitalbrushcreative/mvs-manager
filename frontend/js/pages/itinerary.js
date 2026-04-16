@@ -45,10 +45,10 @@ const ItineraryPage = (function() {
             <div class="num">${dayNum}</div>
             <div class="date">${dayDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</div>
           </div>
-          <div style="border-left: 2px solid var(--grey-100); padding-left: 20px; padding-bottom: 8px;"></div>
+          <div class="itin-day-col" style="border-left: 2px solid var(--grey-100); padding-left: 20px; padding-bottom: 8px;"></div>
         </div>
       `;
-      const col = section.querySelector('div:last-child');
+      const col = section.querySelector('.itin-day-col');
       byDay[day].forEach(a => {
         const item = html`
           <div style="padding: 14px; background: var(--white); border: 1px solid var(--grey-100); border-radius: 6px; margin-bottom: 10px; cursor: pointer; transition: all var(--t-fast);" data-act-id="${a.id}">
