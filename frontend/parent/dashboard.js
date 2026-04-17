@@ -117,16 +117,19 @@
 
       <div style="margin-top:18px;">
         <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--grey-500); font-weight:600;">Documents</div>
-        ${docs.length ? `<ul class="doc-list">${docs.map(d => {
-          const type = docTypes.find(dt => dt.id === d.typeId);
-          return `
-            <li class="doc-item ${d.status}">
-              <div class="doc-icon">${type?.abbr || '?'}</div>
-              <div class="doc-name">${escapeHtml(type?.name || 'Document')}</div>
-              <div class="doc-status">${d.status}</div>
-            </li>
-          `;
-        }).join('')}</ul>` : '<div style="color:var(--grey-400); font-size:13px; margin-top:6px;">No document requirements yet.</div>'}
+        ${p.confirmedByGuardian
+          ? (docs.length ? `<ul class="doc-list">${docs.map(d => {
+              const type = docTypes.find(dt => dt.id === d.typeId);
+              return `
+                <li class="doc-item ${d.status}">
+                  <div class="doc-icon">${type?.abbr || '?'}</div>
+                  <div class="doc-name">${escapeHtml(type?.name || 'Document')}</div>
+                  <div class="doc-status">${d.status}</div>
+                </li>
+              `;
+            }).join('')}</ul>` : '<div style="color:var(--grey-400); font-size:13px; margin-top:6px;">No document requirements yet.</div>')
+          : `<div style="margin-top:6px; padding:10px 12px; background:var(--grey-50); border:1px dashed var(--grey-200); border-radius:var(--r-md); font-size:13px; color:var(--grey-500);">🔒 Confirm ${escapeHtml(p.firstName)}'s attendance to see and upload documents.</div>`
+        }
       </div>
 
       <div style="margin-top:18px; display:flex; gap:10px;">
