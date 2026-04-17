@@ -189,7 +189,7 @@ const RosterPage = (function() {
           <div class="student-cell">
             <div class="stu-avatar ${p.gender.toLowerCase()}">${Fmt.initials(p.firstName + ' ' + p.lastName)}</div>
             <div>
-              <div class="stu-name">${escapeHtml(p.firstName)} ${escapeHtml(p.lastName)}</div>
+              <div class="stu-name">${escapeHtml(p.firstName)} ${escapeHtml(p.lastName)} ${p.confirmedByGuardian ? '<span title="Attendance confirmed by guardian" style="color:var(--success); font-size:12px; margin-left:4px;">✓</span>' : ''}</div>
               <div class="stu-meta">#${escapeHtml(p.admissionNo)}</div>
             </div>
           </div>
