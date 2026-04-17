@@ -217,19 +217,16 @@ const RosterPage = (function() {
           `;
         }
       },
-      {
-        key: 'docs', label: 'Docs', width: '140px',
+      ...Store.getDocumentTypes().filter(dt => dt.required).slice(0, 4).map(type => ({
+        key: `doc:${type.id}`, label: type.name, width: '90px', align: 'center',
         render: (p) => {
-          const docs = Store.getPupilDocuments(p.id);
-          const types = Store.getDocumentTypes().slice(0, 4);
-          return `<div class="doc-pills">${types.map(t => {
-            const d = docs.find(dd => dd.typeId === t.id);
-            const status = d?.status || 'missing';
-            const cls = status === 'verified' ? 'done' : (status === 'submitted' || status === 'expiring') ? 'warning' : 'missing';
-            return `<div class="doc-pill ${cls}" title="${escapeHtml(t.name)}: ${status}">${escapeHtml(t.abbr)}</div>`;
-          }).join('')}</div>`;
+          const d = Store.getPupilDocuments(p.id).find(dd => dd.typeId === type.id);
+          const status = d?.status || 'missing';
+          const cls = status === 'verified' ? 'done' : (status === 'submitted' || status === 'expiring') ? 'warning' : 'missing';
+          const statusLabel = status === 'verified' ? '✓' : status === 'submitted' ? 'sent' : status === 'expiring' ? 'exp.' : status === 'expired' ? 'old' : '—';
+          return `<div class="doc-pill ${cls}" title="${escapeHtml(type.name)}: ${status}">${statusLabel}</div>`;
         }
-      },
+      })),
       {
         key: 'note', label: 'Note',
         render: (p) => p.note ? `<div class="note-cell" title="${escapeHtml(p.note)}">${p.flagged ? '<span class="note-flag"></span>' : ''}${escapeHtml(p.note)}</div>` : '<span style="color: var(--grey-300);">—</span>'

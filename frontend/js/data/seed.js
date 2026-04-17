@@ -310,8 +310,25 @@ const Seed = {
       }
     ];
 
+    const baseInterest = (over) => ({
+      token: (over.id || 'int') + '-tok',
+      note: '',
+      dob: null,
+      medicalNotes: '',
+      dietaryNotes: '',
+      additionalNotes: '',
+      documentsRequested: [],
+      documentsSubmitted: [],
+      status: 'new',
+      submittedAt: new Date(2026, 3, 10).toISOString(),
+      updatedAt: new Date(2026, 3, 10).toISOString(),
+      ...over
+    });
+
     const interests = [
-      {
+      // The demo parent's interest in the Coast trip — keeps the
+      // predictable token so the parent return-link keeps working.
+      baseInterest({
         id: 'int_seed_1',
         token: 'demo-parent-interest-token',
         tripId: 'trip_coast_2026',
@@ -320,17 +337,91 @@ const Seed = {
         parentEmail: users[1].email,
         pupilName: 'Sibling Student',
         pupilGrade: 5,
-        note: 'Interested in the Coast trip for our younger child.',
-        dob: null,
-        medicalNotes: '',
-        dietaryNotes: '',
-        additionalNotes: '',
-        documentsRequested: [],
-        documentsSubmitted: [],
+        note: 'Interested in the Coast trip for our younger child.'
+      }),
+      // Varied examples on the active Malaysia trip
+      baseInterest({
+        id: 'int_m1',
+        tripId: 'trip_malaysia_2026',
+        parentName: 'Sarah Kamau',
+        parentPhone: '0710-120-210',
+        parentEmail: 'sarah.kamau@example.com',
+        pupilName: 'Daniel Kamau', pupilGrade: 6,
+        note: 'Just read the letter. Would like more details on the full cost and instalment plan.',
         status: 'new',
-        submittedAt: new Date(2026, 3, 10).toISOString(),
-        updatedAt: new Date(2026, 3, 10).toISOString()
-      }
+        submittedAt: new Date(2026, 3, 14).toISOString()
+      }),
+      baseInterest({
+        id: 'int_m2',
+        tripId: 'trip_malaysia_2026',
+        parentName: 'John Mwangi',
+        parentPhone: '0710-341-450',
+        parentEmail: 'john.mwangi@example.com',
+        pupilName: 'Grace Mwangi', pupilGrade: 7,
+        note: 'Keen to join. Asking whether the passport can be expedited.',
+        status: 'contacted',
+        submittedAt: new Date(2026, 3, 12).toISOString()
+      }),
+      baseInterest({
+        id: 'int_m3',
+        tripId: 'trip_malaysia_2026',
+        parentName: 'Emily Odera',
+        parentPhone: '0710-502-611',
+        parentEmail: 'emily.odera@example.com',
+        pupilName: 'Max Odera', pupilGrade: 8,
+        note: 'Confirmed attendance, documents in progress.',
+        status: 'awaiting-details',
+        documentsRequested: ['Passport', 'Consent form', 'Medical form'],
+        documentsSubmitted: ['Passport'],
+        submittedAt: new Date(2026, 3, 8).toISOString()
+      }),
+      baseInterest({
+        id: 'int_m4',
+        tripId: 'trip_malaysia_2026',
+        parentName: 'Mark Njuguna',
+        parentPhone: '0710-770-801',
+        parentEmail: 'mark.njuguna@example.com',
+        pupilName: 'Alice Njuguna', pupilGrade: 6,
+        note: 'All documents submitted via WhatsApp.',
+        status: 'submitted',
+        documentsRequested: ['Passport', 'Consent form', 'Medical form', 'Travel insurance'],
+        documentsSubmitted: ['Passport', 'Consent form', 'Medical form', 'Travel insurance'],
+        submittedAt: new Date(2026, 3, 6).toISOString()
+      }),
+      baseInterest({
+        id: 'int_m5',
+        tripId: 'trip_malaysia_2026',
+        parentName: 'Lucy Wanjiru',
+        parentPhone: '0710-912-040',
+        parentEmail: 'lucy.wanjiru@example.com',
+        pupilName: 'Kevin Wanjiru', pupilGrade: 9,
+        status: 'converted',
+        convertedPupilId: null,
+        note: 'Added to roster after seat opened.',
+        submittedAt: new Date(2026, 2, 28).toISOString()
+      }),
+      baseInterest({
+        id: 'int_m6',
+        tripId: 'trip_malaysia_2026',
+        parentName: 'Peter Ochieng',
+        parentPhone: '0710-188-222',
+        pupilName: 'Ryan Ochieng', pupilGrade: 7,
+        status: 'declined',
+        note: 'Opted out — conflicts with another family commitment.',
+        submittedAt: new Date(2026, 2, 20).toISOString()
+      }),
+      // Interest on the Coast trip
+      baseInterest({
+        id: 'int_c1',
+        tripId: 'trip_coast_2026',
+        parentName: 'Martha Wafula',
+        parentEmail: 'martha.wafula@example.com',
+        parentPhone: '0710-444-555',
+        pupilName: 'Hope Wafula', pupilGrade: 6,
+        note: 'Interested — asking about safety briefings.',
+        status: 'new',
+        submittedAt: new Date(2026, 3, 11).toISOString()
+      })
     ];
     users[1].linkedInterestTokens = [interests[0].token];
 
