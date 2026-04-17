@@ -23,7 +23,14 @@ const CommunicationsPage = (function() {
       </div>
     `;
     root.appendChild(card);
-    card.querySelector('#composeBtn').addEventListener('click', () => openCompose());
+    card.querySelector('#composeBtn').addEventListener('click', () => {
+      try {
+        openCompose();
+      } catch (err) {
+        console.error('[Compose] failed to open', err);
+        Toast.error('Compose failed: ' + (err.message || err));
+      }
+    });
 
     const list = card.querySelector('#commsList');
     if (!comms.length) {
@@ -104,10 +111,11 @@ const CommunicationsPage = (function() {
       specificIds: new Set()
     };
 
-    const body = html`<form id="composeFormEl" novalidate></form>`;
+    const body = html`<div class="compose-wrap"><form id="composeFormEl" novalidate></form></div>`;
+    const formEl = body.querySelector('#composeFormEl');
 
     // ---- Channel ----
-    body.appendChild(section('Channel', html`
+    formEl.appendChild(section('Channel', html`
       <div class="radio-group" id="channelGroup">
         ${['email','sms','whatsapp','letter'].map(t =>
           `<label class="radio-opt ${t === 'email' ? 'active' : ''}"><input type="radio" name="type" value="${t}" ${t === 'email' ? 'checked' : ''}>${t.charAt(0).toUpperCase() + t.slice(1)}</label>`
@@ -117,7 +125,7 @@ const CommunicationsPage = (function() {
 
     // ---- Audience ----
     const audienceWrap = html`<div></div>`;
-    body.appendChild(section('Audience', audienceWrap));
+    formEl.appendChild(section('Audience', audienceWrap));
 
     // Source selector
     audienceWrap.appendChild(html`
@@ -140,7 +148,7 @@ const CommunicationsPage = (function() {
     audienceWrap.appendChild(countPreview);
 
     // ---- Message ----
-    body.appendChild(section('Message', html`
+    formEl.appendChild(section('Message', html`
       <div class="form-grid">
         <div class="form-field col-span-2">
           <label class="form-label">Subject</label>
@@ -510,33 +518,35 @@ const CommunicationsPage = (function() {
     });
 
     function send() {
-      // `body` is the <form> element itself (html` ` returns the first
-      // element child), so query it directly.
-      const form = body.id === 'composeFormEl' ? body : body.querySelector('#composeFormEl');
-      const fd = new FormData(form);
-      const subject = (fd.get('subject') || '').toString().trim();
-      const template = (fd.get('body') || '').toString().trim();
-      if (!template) return Toast.error('Please write a message');
+      try {
+        const form = body.id === 'composeFormEl' ? body : body.querySelector('#composeFormEl');
+        if (!form) { Toast.error('Form not found'); return; }
+        const fd = new FormData(form);
+        const subject = (fd.get('subject') || '').toString().trim();
+        const template = (fd.get('body') || '').toString().trim();
+        if (!template) return Toast.error('Please write a message');
 
-      const list = resolveRecipients();
-      if (!list.length) return Toast.error('No recipients selected');
+        const list = resolveRecipients();
+        if (!list.length) return Toast.error('No recipients match the selected filters');
 
-      // Render the first recipient's body as the stored body (we store the template
-      // as-is too, but the quick preview uses the first resolved copy).
-      const renderVars = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
-      const exampleBody = renderVars(template, list[0].vars);
+        const renderVars = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
+        const exampleBody = renderVars(template, list[0].vars);
 
-      Store.createCommunication({
-        type: state.channel,
-        subject,
-        body: exampleBody,
-        template,
-        audienceLabel: buildAudienceLabel(),
-        recipientIds: list.map(r => r.id),
-        recipientCount: list.length
-      });
-      Toast.success(`Logged message to ${list.length} recipient${list.length === 1 ? '' : 's'}`);
-      modal.close();
+        Store.createCommunication({
+          type: state.channel,
+          subject,
+          body: exampleBody,
+          template,
+          audienceLabel: buildAudienceLabel(),
+          recipientIds: list.map(r => r.id),
+          recipientCount: list.length
+        });
+        Toast.success(`Logged message to ${list.length} recipient${list.length === 1 ? '' : 's'}`);
+        modal.close();
+      } catch (err) {
+        console.error('[Compose] send failed', err);
+        Toast.error('Send failed: ' + (err.message || err));
+      }
     }
   }
 
