@@ -816,7 +816,16 @@
 .audience-tabs .tab:hover { color: var(--grey-900); }
 .audience-tabs .tab.active { background: var(--white); color: var(--navy-darker); box-shadow: var(--shadow-sm); }
 
-.chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.filter-group-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--grey-400);
+  font-weight: 700;
+  margin: 10px 0 6px;
+}
+.filter-group-label:first-child { margin-top: 0; }
 .chip-filter {
   padding: 6px 12px;
   background: var(--white);

@@ -232,24 +232,70 @@ const CommunicationsPage = (function() {
 
     function renderPupilFilters() {
       const pupils = Store.getPupils(trip.id);
+      const docs = Store.getDocuments(trip.id);
+      const docTypes = Store.getDocumentTypes();
       const grades = [...new Set(pupils.map(p => p.grade))].sort();
+
+      // counts
+      const countOutstanding = pupils.filter(p => {
+        const b = Store.getPupilBalance(p.id);
+        return b.balance > 0;
+      }).length;
+      const countNoPayment = pupils.filter(p => Store.getPupilPayments(p.id).length === 0).length;
+
+      const docsByPupilType = {}; // "pupilId|typeId" -> status
+      docs.forEach(d => { docsByPupilType[`${d.pupilId}|${d.typeId}`] = d.status; });
+      const countMissingType = (typeId) => pupils.filter(p => docsByPupilType[`${p.id}|${typeId}`] === 'missing').length;
+      const countDocExpiring = pupils.filter(p => docs.some(d => d.pupilId === p.id && (d.status === 'expiring' || d.status === 'expired'))).length;
+
+      const countMissingField = (field) => pupils.filter(p => !p[field] || String(p[field]).trim() === '').length;
+
+      const perTypeChips = docTypes
+        .filter(dt => dt.required)
+        .map(dt => filterChip(`missing-doc:${dt.id}`, `No ${dt.name.toLowerCase()} (${countMissingType(dt.id)})`, state.pupilFilters.has(`missing-doc:${dt.id}`)))
+        .join('');
+
       filterArea.appendChild(html`
         <div>
+          <div class="filter-group-label">Cohort</div>
           <div class="chip-group">
             ${filterChip('all', `All enrolled (${pupils.length})`, state.pupilFilters.has('all'))}
-            ${filterChip('paid', `Paid in full`, state.pupilFilters.has('paid'))}
-            ${filterChip('deposit', `On deposit`, state.pupilFilters.has('deposit'))}
-            ${filterChip('pending', `Pending`, state.pupilFilters.has('pending'))}
-            ${filterChip('overdue', `Overdue`, state.pupilFilters.has('overdue'))}
-            ${filterChip('flagged', `Flagged`, state.pupilFilters.has('flagged'))}
-            ${filterChip('missing-docs', `Missing docs`, state.pupilFilters.has('missing-docs'))}
+            ${filterChip('flagged', `Flagged (${pupils.filter(p=>p.flagged).length})`, state.pupilFilters.has('flagged'))}
           </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+
+          <div class="filter-group-label">Payment</div>
+          <div class="chip-group">
+            ${filterChip('paid', `Paid in full (${pupils.filter(p=>p.paymentStatus==='paid').length})`, state.pupilFilters.has('paid'))}
+            ${filterChip('deposit', `On deposit (${pupils.filter(p=>p.paymentStatus==='deposit').length})`, state.pupilFilters.has('deposit'))}
+            ${filterChip('pending', `Pending (${pupils.filter(p=>p.paymentStatus==='pending').length})`, state.pupilFilters.has('pending'))}
+            ${filterChip('overdue', `Overdue (${pupils.filter(p=>p.paymentStatus==='overdue').length})`, state.pupilFilters.has('overdue'))}
+            ${filterChip('outstanding', `Outstanding balance (${countOutstanding})`, state.pupilFilters.has('outstanding'))}
+            ${filterChip('no-payment', `No payment yet (${countNoPayment})`, state.pupilFilters.has('no-payment'))}
+          </div>
+
+          <div class="filter-group-label">Documents</div>
+          <div class="chip-group">
+            ${filterChip('missing-docs', `Missing any required doc`, state.pupilFilters.has('missing-docs'))}
+            ${perTypeChips}
+            ${countDocExpiring > 0 ? filterChip('doc-expiring', `Expiring / expired (${countDocExpiring})`, state.pupilFilters.has('doc-expiring')) : ''}
+          </div>
+
+          <div class="filter-group-label">Profile completeness</div>
+          <div class="chip-group">
+            ${filterChip('missing-dob', `No date of birth (${countMissingField('dob')})`, state.pupilFilters.has('missing-dob'))}
+            ${filterChip('missing-dietary', `No dietary info (${countMissingField('dietaryNotes')})`, state.pupilFilters.has('missing-dietary'))}
+            ${filterChip('missing-medical-notes', `No medical info (${countMissingField('medicalNotes')})`, state.pupilFilters.has('missing-medical-notes'))}
+            ${filterChip('missing-email', `No guardian email (${countMissingField('guardianEmail')})`, state.pupilFilters.has('missing-email'))}
+            ${filterChip('missing-phone', `No guardian phone (${countMissingField('guardianPhone')})`, state.pupilFilters.has('missing-phone'))}
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px; margin-top:12px;">
             <label style="font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--grey-500); font-weight:600;">Grade:</label>
             <select class="form-select" id="gradeSelect" style="width:auto; padding:6px 10px;">
               <option value="all" ${state.gradeFilter === 'all' ? 'selected' : ''}>All grades</option>
               ${grades.map(g => `<option value="${g}" ${state.gradeFilter == g ? 'selected' : ''}>Grade ${g}</option>`).join('')}
             </select>
+            <div style="font-size:11px; color:var(--grey-500);">Pick any chips — a pupil is included if they match any one. Click 'All enrolled' to reset.</div>
           </div>
         </div>
       `);
@@ -389,16 +435,34 @@ const CommunicationsPage = (function() {
         let list = pupils;
         if (state.gradeFilter !== 'all') list = list.filter(p => String(p.grade) === String(state.gradeFilter));
         if (!state.pupilFilters.has('all')) {
+          const tripDocs = Store.getDocuments(trip.id);
           const docsByPupil = {};
-          Store.getDocuments(trip.id).forEach(d => {
+          tripDocs.forEach(d => {
             if (!docsByPupil[d.pupilId]) docsByPupil[d.pupilId] = [];
             docsByPupil[d.pupilId].push(d);
           });
+          const isEmpty = (v) => !v || String(v).trim() === '';
           list = list.filter(p => {
             for (const f of state.pupilFilters) {
+              // Payment status
               if (['paid','deposit','pending','overdue'].includes(f) && p.paymentStatus === f) return true;
+              if (f === 'outstanding' && Store.getPupilBalance(p.id).balance > 0) return true;
+              if (f === 'no-payment' && Store.getPupilPayments(p.id).length === 0) return true;
+              // Flagged
               if (f === 'flagged' && p.flagged) return true;
+              // Docs
               if (f === 'missing-docs' && (docsByPupil[p.id] || []).some(d => d.status === 'missing')) return true;
+              if (f === 'doc-expiring' && (docsByPupil[p.id] || []).some(d => d.status === 'expiring' || d.status === 'expired')) return true;
+              if (f.startsWith('missing-doc:')) {
+                const typeId = f.slice('missing-doc:'.length);
+                if ((docsByPupil[p.id] || []).some(d => d.typeId === typeId && d.status === 'missing')) return true;
+              }
+              // Profile completeness
+              if (f === 'missing-dob' && isEmpty(p.dob)) return true;
+              if (f === 'missing-dietary' && isEmpty(p.dietaryNotes)) return true;
+              if (f === 'missing-medical-notes' && isEmpty(p.medicalNotes)) return true;
+              if (f === 'missing-email' && isEmpty(p.guardianEmail)) return true;
+              if (f === 'missing-phone' && isEmpty(p.guardianPhone)) return true;
             }
             return false;
           });
