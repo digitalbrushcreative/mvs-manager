@@ -234,21 +234,23 @@ const CommunicationsPage = (function() {
       const pupils = Store.getPupils(trip.id);
       const grades = [...new Set(pupils.map(p => p.grade))].sort();
       filterArea.appendChild(html`
-        <div class="chip-group">
-          ${filterChip('all', `All enrolled (${pupils.length})`, state.pupilFilters.has('all'))}
-          ${filterChip('paid', `Paid in full`, state.pupilFilters.has('paid'))}
-          ${filterChip('deposit', `On deposit`, state.pupilFilters.has('deposit'))}
-          ${filterChip('pending', `Pending`, state.pupilFilters.has('pending'))}
-          ${filterChip('overdue', `Overdue`, state.pupilFilters.has('overdue'))}
-          ${filterChip('flagged', `Flagged`, state.pupilFilters.has('flagged'))}
-          ${filterChip('missing-docs', `Missing docs`, state.pupilFilters.has('missing-docs'))}
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
-          <label style="font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--grey-500); font-weight:600;">Grade:</label>
-          <select class="form-select" id="gradeSelect" style="width:auto; padding:6px 10px;">
-            <option value="all" ${state.gradeFilter === 'all' ? 'selected' : ''}>All grades</option>
-            ${grades.map(g => `<option value="${g}" ${state.gradeFilter == g ? 'selected' : ''}>Grade ${g}</option>`).join('')}
-          </select>
+        <div>
+          <div class="chip-group">
+            ${filterChip('all', `All enrolled (${pupils.length})`, state.pupilFilters.has('all'))}
+            ${filterChip('paid', `Paid in full`, state.pupilFilters.has('paid'))}
+            ${filterChip('deposit', `On deposit`, state.pupilFilters.has('deposit'))}
+            ${filterChip('pending', `Pending`, state.pupilFilters.has('pending'))}
+            ${filterChip('overdue', `Overdue`, state.pupilFilters.has('overdue'))}
+            ${filterChip('flagged', `Flagged`, state.pupilFilters.has('flagged'))}
+            ${filterChip('missing-docs', `Missing docs`, state.pupilFilters.has('missing-docs'))}
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+            <label style="font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--grey-500); font-weight:600;">Grade:</label>
+            <select class="form-select" id="gradeSelect" style="width:auto; padding:6px 10px;">
+              <option value="all" ${state.gradeFilter === 'all' ? 'selected' : ''}>All grades</option>
+              ${grades.map(g => `<option value="${g}" ${state.gradeFilter == g ? 'selected' : ''}>Grade ${g}</option>`).join('')}
+            </select>
+          </div>
         </div>
       `);
       filterArea.querySelectorAll('[data-chip]').forEach(c => {
@@ -316,9 +318,11 @@ const CommunicationsPage = (function() {
       const pupils = Store.getPupils(trip.id);
       const interests = Store.getInterests(trip.id);
       filterArea.appendChild(html`
-        <input type="search" class="form-input" id="pickerSearch" placeholder="Search by name, grade, email…" style="margin-bottom:10px;">
-        <div class="picker-list" id="pickerList" style="max-height:220px; overflow-y:auto; border:1px solid var(--grey-100); border-radius:var(--r-md);"></div>
-        <div style="font-size:12px; color:var(--grey-500); margin-top:6px;">${pupils.length} pupils · ${interests.length} interest${interests.length === 1 ? '' : 's'}</div>
+        <div>
+          <input type="search" class="form-input" id="pickerSearch" placeholder="Search by name, grade, email…" style="margin-bottom:10px;">
+          <div class="picker-list" id="pickerList" style="max-height:220px; overflow-y:auto; border:1px solid var(--grey-100); border-radius:var(--r-md);"></div>
+          <div style="font-size:12px; color:var(--grey-500); margin-top:6px;">${pupils.length} pupils · ${interests.length} interest${interests.length === 1 ? '' : 's'}</div>
+        </div>
       `);
       const listEl = filterArea.querySelector('#pickerList');
       const searchEl = filterArea.querySelector('#pickerSearch');
