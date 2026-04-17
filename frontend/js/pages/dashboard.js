@@ -217,32 +217,41 @@ const DashboardPage = (function() {
       grid.appendChild(card3);
     }
 
-    // --- Capacity across all trips ---
-    const capacityData = trips.map(t => {
+    // --- Seat utilisation — compact tile grid ---
+    const seatBody = html`<div class="mini-tile-grid"></div>`;
+    trips.forEach(t => {
       const s = Store.tripStats(t.id) || {};
-      return {
-        name: `${t.code} — ${t.name}`,
-        capacity: t.seatsTotal || 0,
-        segments: [
-          { label: 'Pupils',     value: s.enrolled || 0,       color: 'var(--navy)' },
-          { label: 'Chaperones', value: t.chaperones || 0,     color: 'var(--gold)' },
-          { label: 'Parents',    value: t.parentsJoining || 0, color: 'var(--info)' }
-        ]
-      };
+      const used = s.seatsUsed || 0;
+      const total = t.seatsTotal || 0;
+      const pct = total ? Math.min(100, Math.round((used / total) * 100)) : 0;
+      const over = s.overCapacity;
+      const pupilPct = total ? (s.enrolled || 0) / total * 100 : 0;
+      const chapPct = total ? (t.chaperones || 0) / total * 100 : 0;
+      const parPct = total ? (t.parentsJoining || 0) / total * 100 : 0;
+      const stripeColour = over ? 'var(--crimson)' : pct >= 90 ? 'var(--warning)' : 'var(--navy)';
+      const tile = html`
+        <div class="mini-tile">
+          <div class="mini-tile-head">
+            <div class="mini-tile-dot" style="background:${stripeColour};"></div>
+            <span class="mini-tile-name">${escapeHtml(t.code)} · ${escapeHtml(t.name)}</span>
+            <span class="mini-tile-count">${used}/${total}</span>
+          </div>
+          <div class="mini-tile-bar stacked">
+            <div style="width:${pupilPct}%; background:var(--navy);"></div>
+            <div style="width:${chapPct}%; background:var(--gold);"></div>
+            <div style="width:${parPct}%; background:var(--info);"></div>
+          </div>
+          <div class="mini-tile-sub">${s.enrolled || 0} pupils · ${t.chaperones || 0} chap · ${t.parentsJoining || 0} parents${over ? ' · <strong style="color:var(--crimson);">over</strong>' : pct >= 90 ? ' · almost full' : ''}</div>
+        </div>
+      `;
+      seatBody.appendChild(tile);
     });
-    const cardCap = chartCard(
-      'Seat utilisation — all trips',
-      'Pupils + chaperones + parents vs total seats',
-      Charts.capacityRows(capacityData),
-      'wide'
-    );
-    // Capacity legend
+    const cardCap = chartCard('Seat utilisation', `${trips.length} trips · pupils + chaperones + parents vs total`, seatBody, 'wide');
     cardCap.appendChild(html`
-      <div class="chart-legend chart-legend-horizontal" style="margin-top: 8px;">
+      <div class="chart-legend chart-legend-horizontal" style="margin-top:4px;">
         <div class="legend-row"><span class="legend-dot" style="background:var(--navy);"></span><span class="legend-label">Pupils</span></div>
         <div class="legend-row"><span class="legend-dot" style="background:var(--gold);"></span><span class="legend-label">Chaperones</span></div>
         <div class="legend-row"><span class="legend-dot" style="background:var(--info);"></span><span class="legend-label">Parents</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:var(--grey-100);"></span><span class="legend-label">Empty</span></div>
       </div>
     `);
     grid.appendChild(cardCap);

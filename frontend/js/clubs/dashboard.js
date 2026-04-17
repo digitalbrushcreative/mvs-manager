@@ -47,30 +47,26 @@ const ClubsDashboardPage = (function () {
     const grid = html`<div class="insights-grid"></div>`;
     insights.appendChild(grid);
 
-    // Club size stacked bars
-    const sizeData = clubs.map(c => {
-      const clubMemberCount = members.filter(m => m.clubId === c.id).length;
-      const captains = members.filter(m => m.clubId === c.id && m.role === 'captain').length;
-      const committee = members.filter(m => m.clubId === c.id && m.role === 'committee').length;
-      return {
-        name: `${c.emoji} ${c.name}`,
-        capacity: pupils.length,
-        segments: [
-          { label: 'Captains',  value: captains,  color: 'var(--gold)' },
-          { label: 'Committee', value: committee, color: 'var(--crimson)' },
-          { label: 'Members',   value: clubMemberCount - captains - committee, color: c.colour || 'var(--navy)' }
-        ]
-      };
+    // Club membership — compact tile grid
+    const sizeBody = html`<div class="mini-tile-grid"></div>`;
+    clubs.forEach(c => {
+      const mem = members.filter(m => m.clubId === c.id);
+      const pct = pupils.length ? Math.round((mem.length / pupils.length) * 100) : 0;
+      const captains = mem.filter(m => m.role === 'captain').length;
+      const tile = html`
+        <div class="mini-tile">
+          <div class="mini-tile-head">
+            <div class="mini-tile-dot" style="background:${c.colour};"></div>
+            <span class="mini-tile-name">${c.emoji} ${escapeHtml(c.name)}</span>
+            <span class="mini-tile-count">${mem.length}</span>
+          </div>
+          <div class="mini-tile-bar"><div style="width:${pct}%; background:${c.colour};"></div></div>
+          <div class="mini-tile-sub">${pct}% of pupils${captains ? ` · ${captains} capt.` : ''}</div>
+        </div>
+      `;
+      sizeBody.appendChild(tile);
     });
-    const sizeCard = chartCard('Membership per club', 'Members (leads + committee + regular) vs total pupils', Charts.capacityRows(sizeData), 'wide');
-    sizeCard.appendChild(html`
-      <div class="chart-legend chart-legend-horizontal" style="margin-top:8px;">
-        <div class="legend-row"><span class="legend-dot" style="background:var(--gold);"></span><span class="legend-label">Captains</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:var(--crimson);"></span><span class="legend-label">Committee</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:var(--navy);"></span><span class="legend-label">Members</span></div>
-      </div>
-    `);
-    grid.appendChild(sizeCard);
+    grid.appendChild(chartCard('Membership per club', `${members.length} total memberships across ${clubs.length} clubs`, sizeBody, 'wide'));
 
     // Pupil engagement donut
     const countByPupil = {};
@@ -95,23 +91,33 @@ const ClubsDashboardPage = (function () {
     );
     grid.appendChild(engagementCard);
 
-    // Meeting schedule — simple list grouped by day
+    // Meeting schedule — week calendar
+    const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayMap = {};
-    ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].forEach(d => dayMap[d] = []);
+    weekDays.forEach(d => dayMap[d] = []);
     clubs.forEach(c => { if (dayMap[c.meetingDay]) dayMap[c.meetingDay].push(c); });
-    const scheduleBody = html`
-      <div class="schedule-list">
-        ${Object.entries(dayMap).filter(([_, cs]) => cs.length).map(([day, cs]) => `
-          <div class="schedule-row">
-            <div class="schedule-day">${day.slice(0, 3).toUpperCase()}</div>
-            <div class="schedule-clubs">
-              ${cs.map(c => `<span class="schedule-chip" style="background:${c.colour};">${c.emoji} ${escapeHtml(c.name)} <span style="opacity:0.7;">· ${escapeHtml(c.meetingTime)}</span></span>`).join('')}
+    // Sort each day's clubs by meeting time
+    Object.values(dayMap).forEach(cs => cs.sort((a, b) => (a.meetingTime || '').localeCompare(b.meetingTime || '')));
+    const calBody = html`
+      <div class="week-calendar">
+        ${weekDays.map(day => `
+          <div class="week-cell">
+            <div class="week-cell-head">${day.slice(0, 3).toUpperCase()}</div>
+            <div class="week-cell-body">
+              ${dayMap[day].length
+                ? dayMap[day].map(c => `
+                  <div class="week-event" style="border-left-color:${c.colour};" title="${escapeHtml(c.name)} — ${escapeHtml(c.venue || '')}">
+                    <div class="week-event-time">${escapeHtml(c.meetingTime || '')}</div>
+                    <div class="week-event-name">${c.emoji} ${escapeHtml(c.name)}</div>
+                  </div>
+                `).join('')
+                : '<div class="week-empty">—</div>'}
             </div>
           </div>
         `).join('')}
       </div>
     `;
-    grid.appendChild(chartCard('Meeting schedule', 'Clubs by day of week', scheduleBody));
+    grid.appendChild(chartCard('Meeting schedule', 'Week at a glance', calBody, 'wide'));
 
     root.appendChild(insights);
 
