@@ -26,6 +26,7 @@ const Seed = {
         currency: 'USD',
         chaperones: 4,
         parentsJoining: 6,
+        clubIds: ['club_debate'],
         description: '12-day expedition across Malaysia covering cultural heritage, natural wonders, and educational visits.',
         installments: [
           { id: 'i1', name: 'Deposit', amount: 500, dueDate: '2026-02-15' },
@@ -425,7 +426,41 @@ const Seed = {
     ];
     users[1].linkedInterestTokens = [interests[0].token];
 
-    return { trips, pupils, documents, payments, activities, bookings, communications, documentTypes, users, interests };
+    // ---- Clubs (Phase 1) ----
+    const clubs = [
+      { id: 'club_debate',   name: 'Debate Club',   emoji: '🎤', colour: '#2c3f6b', leadStaff: 'Ms. Asha Rweyemamu', meetingDay: 'Wednesday', meetingTime: '16:00', venue: 'Room 204', status: 'active', description: 'Competitive and casual debate practice. Monthly inter-school rounds.', assistants: [], createdAt: '2025-09-10T00:00:00Z' },
+      { id: 'club_swimming', name: 'Swimming',       emoji: '🏊', colour: '#2c5a8a', leadStaff: 'Coach D. Khalif',     meetingDay: 'Tuesday',   meetingTime: '06:30', venue: 'Main pool', status: 'active', description: 'Stroke technique, endurance training, and gala prep.', assistants: [], createdAt: '2025-09-10T00:00:00Z' },
+      { id: 'club_scouts',   name: 'Scouts',         emoji: '🌲', colour: '#5a8a3d', leadStaff: 'Mr. T. Onyango',      meetingDay: 'Friday',    meetingTime: '15:30', venue: 'Quad',      status: 'active', description: 'Outdoor skills, community service, and annual camping trips.', assistants: [], createdAt: '2025-09-10T00:00:00Z' },
+      { id: 'club_chess',    name: 'Chess Club',     emoji: '♟️', colour: '#394050', leadStaff: 'Dr. V. Sharma',       meetingDay: 'Thursday',  meetingTime: '16:00', venue: 'Library', status: 'active', description: 'Opening theory, puzzles, and local-tournament travel.', assistants: [], createdAt: '2025-09-10T00:00:00Z' },
+      { id: 'club_ballet',   name: 'Ballet',         emoji: '🩰', colour: '#c8202b', leadStaff: 'Mme. L. Bernard',     meetingDay: 'Monday',    meetingTime: '16:00', venue: 'Studio B', status: 'active', description: 'Classical technique and annual showcase.', assistants: [], createdAt: '2025-09-10T00:00:00Z' }
+    ];
+
+    // ---- Membership assignments (programmatic based on rules) ----
+    // debate: grades 7-9 (every 3rd pupil in that range)
+    // swimming: grades 6-9 (every 4th pupil)
+    // chess: grades 6-9 (every 5th pupil, offset)
+    // scouts: grades 6-8 (every 3rd pupil)
+    // ballet: female pupils grades 6-7
+    const clubMembers = [];
+    pupils.forEach((p, idx) => {
+      if (p.grade >= 7 && p.grade <= 9 && idx % 3 === 0) {
+        clubMembers.push({ id: `cmem_${clubMembers.length+1}`, clubId: 'club_debate', pupilId: p.id, role: idx % 11 === 0 ? 'captain' : 'member', joinedAt: '2025-09-15T00:00:00Z' });
+      }
+      if (p.grade >= 6 && p.grade <= 9 && idx % 4 === 0) {
+        clubMembers.push({ id: `cmem_${clubMembers.length+1}`, clubId: 'club_swimming', pupilId: p.id, role: 'member', joinedAt: '2025-09-12T00:00:00Z' });
+      }
+      if (p.grade >= 6 && p.grade <= 9 && (idx + 2) % 5 === 0) {
+        clubMembers.push({ id: `cmem_${clubMembers.length+1}`, clubId: 'club_chess', pupilId: p.id, role: 'member', joinedAt: '2025-09-20T00:00:00Z' });
+      }
+      if (p.grade >= 6 && p.grade <= 8 && (idx + 1) % 3 === 0) {
+        clubMembers.push({ id: `cmem_${clubMembers.length+1}`, clubId: 'club_scouts', pupilId: p.id, role: 'member', joinedAt: '2025-09-18T00:00:00Z' });
+      }
+      if (p.gender === 'F' && p.grade >= 6 && p.grade <= 7 && idx % 2 === 0) {
+        clubMembers.push({ id: `cmem_${clubMembers.length+1}`, clubId: 'club_ballet', pupilId: p.id, role: 'member', joinedAt: '2025-09-14T00:00:00Z' });
+      }
+    });
+
+    return { trips, pupils, documents, payments, activities, bookings, communications, documentTypes, users, interests, clubs, clubMembers };
   },
 
   seedIfNeeded(force = false) {
@@ -441,6 +476,8 @@ const Seed = {
     Storage.set(StorageKeys.DOCUMENT_TYPES, data.documentTypes);
     Storage.set(StorageKeys.USERS, data.users);
     Storage.set(StorageKeys.INTERESTS, data.interests);
+    Storage.set(StorageKeys.CLUBS, data.clubs);
+    Storage.set(StorageKeys.CLUB_MEMBERS, data.clubMembers);
     Storage.set(StorageKeys.SETTINGS, {
       activeTripId: 'trip_malaysia_2026',
       currency: 'USD',

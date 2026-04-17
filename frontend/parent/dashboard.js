@@ -80,6 +80,11 @@
     if (!p.medicalNotes) profileBits.push('medical info');
     if (!p.dietaryNotes) profileBits.push('dietary info');
 
+    // Clubs the pupil belongs to
+    const clubs = Storage.get('mvs-trips:clubs', []);
+    const memberships = Storage.get('mvs-trips:club-members', []).filter(m => m.pupilId === p.id);
+    const pupilClubs = memberships.map(m => ({ ...m, club: clubs.find(c => c.id === m.clubId) })).filter(x => x.club);
+
     const card = document.createElement('article');
     card.className = 'pupil-card';
     card.innerHTML = `
@@ -131,6 +136,19 @@
           : `<div style="margin-top:6px; padding:10px 12px; background:var(--grey-50); border:1px dashed var(--grey-200); border-radius:var(--r-md); font-size:13px; color:var(--grey-500);">🔒 Confirm ${escapeHtml(p.firstName)}'s attendance to see and upload documents.</div>`
         }
       </div>
+
+      ${pupilClubs.length ? `
+        <div style="margin-top:16px;">
+          <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--grey-500); font-weight:600; margin-bottom:6px;">Clubs</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            ${pupilClubs.map(({ club, role }) => `
+              <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; background:${club.colour}; color:var(--white); border-radius:999px; font-size:12px; font-weight:600;">
+                ${club.emoji} ${escapeHtml(club.name)}${role !== 'member' ? ' · ' + role : ''}
+              </span>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
 
       <div style="margin-top:18px; display:flex; gap:10px;">
         <button class="trip-card-interest" style="flex:1;" data-manage>Manage details</button>

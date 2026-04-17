@@ -16,6 +16,8 @@ const Schema = {
   CommType: ['email', 'sms', 'whatsapp', 'letter'],
   TripStatus: ['draft', 'open', 'closed', 'in-progress', 'complete', 'cancelled'],
   TripType: ['local', 'international'],
+  ClubStatus: ['active', 'paused', 'archived'],
+  ClubMemberRole: ['member', 'captain', 'committee'],
 
   // ----- Factories -----
   newTrip(overrides = {}) {
@@ -28,6 +30,7 @@ const Schema = {
       endDate: null,
       status: 'draft',
       tripType: 'international',
+      clubIds: [],
       gradesAllowed: [6, 7, 8, 9],
       seatsTotal: 40,
       costPerPupil: 0,
@@ -155,6 +158,35 @@ const Schema = {
       bookedCount: 0,
       supplier: '',
       notes: '',
+      ...overrides
+    };
+  },
+
+  newClub(overrides = {}) {
+    return {
+      id: Fmt.uid('club'),
+      name: '',
+      emoji: '🎯',
+      colour: '#2c3f6b',
+      description: '',
+      leadStaff: '',
+      assistants: [],
+      meetingDay: 'Wednesday',
+      meetingTime: '16:00',
+      venue: '',
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      ...overrides
+    };
+  },
+
+  newClubMember(overrides = {}) {
+    return {
+      id: Fmt.uid('cmem'),
+      clubId: null,
+      pupilId: null,
+      role: 'member',
+      joinedAt: new Date().toISOString(),
       ...overrides
     };
   },

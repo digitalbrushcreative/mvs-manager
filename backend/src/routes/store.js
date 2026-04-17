@@ -13,6 +13,8 @@ const ALLOWED_KEYS = new Set([
   'mvs-trips:communications',
   'mvs-trips:document-types',
   'mvs-trips:interests',
+  'mvs-trips:clubs',
+  'mvs-trips:club-members',
   'mvs-trips:users',
   'mvs-trips:sessions',
   'mvs-trips:settings',

@@ -36,16 +36,24 @@ function publicTrip(t) {
     status: t.status,
     seatsTotal: t.seatsTotal,
     chaperones: t.chaperones,
-    parentsJoining: t.parentsJoining || 0
+    parentsJoining: t.parentsJoining || 0,
+    clubIds: t.clubIds || []
   };
+}
+
+function publicClubs() {
+  const clubs = readKey('mvs-trips:clubs') || [];
+  return clubs.map(c => ({ id: c.id, name: c.name, emoji: c.emoji, colour: c.colour }));
 }
 
 router.get('/trips', (_req, res) => {
   const trips = readKey(TRIPS_KEY) || [];
-  // Show everything that isn't finished or called off; admin uses the
-  // 'status' field on each card so parents can tell what's bookable.
   const hidden = new Set(['cancelled', 'complete']);
   res.json(trips.filter(t => !hidden.has(t.status)).map(publicTrip));
+});
+
+router.get('/clubs', (_req, res) => {
+  res.json(publicClubs());
 });
 
 router.post('/interests', (req, res) => {

@@ -44,6 +44,10 @@ const TripForm = {
               <label class="form-label">Description</label>
               <textarea class="form-textarea" name="description" rows="2">${escapeHtml(trip.description)}</textarea>
             </div>
+            <div class="form-field col-span-2">
+              <label class="form-label">Linked clubs <span style="color:var(--grey-400); font-weight:400;">— tag this trip with one or more school clubs</span></label>
+              <div id="clubPicker" class="chip-group" style="padding:8px; border:1px solid var(--grey-200); border-radius:var(--r-md); min-height:42px;"></div>
+            </div>
           </div>
         </div>
 
@@ -97,6 +101,26 @@ const TripForm = {
         </div>
       </form>
     `;
+
+    // Club picker — chip-style multi-select
+    const selectedClubIds = new Set(trip.clubIds || []);
+    const clubPicker = body.querySelector('#clubPicker');
+    if (clubPicker) {
+      const allClubs = typeof Store.getClubs === 'function' ? Store.getClubs() : [];
+      if (!allClubs.length) {
+        clubPicker.innerHTML = '<span style="font-size:12px; color:var(--grey-400); padding:6px;">No clubs defined yet — create some in Club Manager.</span>';
+      } else {
+        allClubs.forEach(c => {
+          const on = selectedClubIds.has(c.id);
+          const chip = html`<button type="button" class="chip-filter ${on ? 'active' : ''}" data-club="${c.id}">${c.emoji} ${escapeHtml(c.name)}</button>`;
+          chip.addEventListener('click', () => {
+            if (selectedClubIds.has(c.id)) { selectedClubIds.delete(c.id); chip.classList.remove('active'); }
+            else { selectedClubIds.add(c.id); chip.classList.add('active'); }
+          });
+          clubPicker.appendChild(chip);
+        });
+      }
+    }
 
     body.querySelector('[name=currency]').addEventListener('change', (e) => {
       const prefix = body.querySelector('#tripCurPrefix');
@@ -182,7 +206,8 @@ const TripForm = {
         chaperones: parseInt(val('chaperones'), 10) || 0,
         parentsJoining: parseInt(val('parentsJoining'), 10) || 0,
         costPerPupil: parseFloat(val('costPerPupil')) || 0,
-        currency: val('currency') || 'USD'
+        currency: val('currency') || 'USD',
+        clubIds: Array.from(selectedClubIds)
       };
 
       try {

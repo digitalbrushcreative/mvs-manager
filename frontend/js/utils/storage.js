@@ -22,6 +22,8 @@ const StorageKeys = {
   COMMUNICATIONS: 'mvs-trips:communications',
   DOCUMENT_TYPES: 'mvs-trips:document-types',
   INTERESTS: 'mvs-trips:interests',
+  CLUBS: 'mvs-trips:clubs',
+  CLUB_MEMBERS: 'mvs-trips:club-members',
   USERS: 'mvs-trips:users',
   SESSIONS: 'mvs-trips:sessions',
   SETTINGS: 'mvs-trips:settings',

@@ -32,9 +32,13 @@
 
   // ---------- Brochure ----------
   let currentTrips = [];
+  let allClubs = [];
   async function renderBrochure() {
+    try {
+      const r = await fetch(`${API}/public/clubs`);
+      if (r.ok) allClubs = await r.json();
+    } catch {}
     await loadAndRenderTrips();
-    // Live refresh every 20s so admin changes surface automatically.
     setInterval(loadAndRenderTrips, 20000);
     root.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-interest-trip]');
@@ -76,9 +80,13 @@
     return `
       <article class="trip-card">
         <div class="trip-card-banner ${t.tripType === 'local' ? 'local' : ''}">
-          <div style="display:flex; gap:6px; align-items:center; margin-bottom:10px;">
+          <div style="display:flex; gap:6px; align-items:center; margin-bottom:10px; flex-wrap:wrap;">
             <span class="trip-card-type">${escapeHtml(t.tripType || 'international')}</span>
             <span class="trip-card-type" style="background:rgba(255,255,255,0.08);">${escapeHtml(statusLabel)}</span>
+            ${(t.clubIds || []).map(id => {
+              const c = allClubs.find(cl => cl.id === id);
+              return c ? `<span class="trip-card-type" style="background:rgba(0,0,0,0.18);">${c.emoji} ${escapeHtml(c.name)}</span>` : '';
+            }).join('')}
           </div>
           <h2 class="trip-card-title">${escapeHtml(t.name)}</h2>
           <div class="trip-card-destination">${escapeHtml(t.destination || '')}</div>

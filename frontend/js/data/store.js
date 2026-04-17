@@ -392,6 +392,81 @@ const Store = (function () {
     return pupil;
   }
 
+  // ----- CLUBS -----
+  function getClubs() { return Storage.get(StorageKeys.CLUBS, []); }
+  function getClub(id) { return getClubs().find(c => c.id === id); }
+  function createClub(data) {
+    const clubs = getClubs();
+    const club = { ...Schema.newClub(), ...data, id: data.id || Fmt.uid('club') };
+    clubs.push(club);
+    Storage.set(StorageKeys.CLUBS, clubs);
+    notify('clubs');
+    return club;
+  }
+  function updateClub(id, patch) {
+    const clubs = getClubs();
+    const idx = clubs.findIndex(c => c.id === id);
+    if (idx === -1) return null;
+    clubs[idx] = { ...clubs[idx], ...patch };
+    Storage.set(StorageKeys.CLUBS, clubs);
+    notify('clubs');
+    return clubs[idx];
+  }
+  function deleteClub(id) {
+    Storage.set(StorageKeys.CLUBS, getClubs().filter(c => c.id !== id));
+    // Cascade: drop memberships for this club
+    Storage.set(StorageKeys.CLUB_MEMBERS, getClubMembers().filter(m => m.clubId !== id));
+    // Remove from any trip.clubIds
+    const trips = getTrips();
+    let tripsChanged = false;
+    trips.forEach(t => {
+      if (t.clubIds && t.clubIds.includes(id)) {
+        t.clubIds = t.clubIds.filter(x => x !== id);
+        tripsChanged = true;
+      }
+    });
+    if (tripsChanged) Storage.set(StorageKeys.TRIPS, trips);
+    notify('clubs');
+    notify('clubMembers');
+    if (tripsChanged) notify('trips');
+  }
+
+  // ----- CLUB MEMBERSHIPS -----
+  function getClubMembers() { return Storage.get(StorageKeys.CLUB_MEMBERS, []); }
+  function getClubMembership(id) { return getClubMembers().find(m => m.id === id); }
+  function getMembersOfClub(clubId) { return getClubMembers().filter(m => m.clubId === clubId); }
+  function getClubsForPupil(pupilId) {
+    const memberships = getClubMembers().filter(m => m.pupilId === pupilId);
+    const clubs = getClubs();
+    return memberships.map(m => ({ ...m, club: clubs.find(c => c.id === m.clubId) }));
+  }
+  function addClubMember(data) {
+    const existing = getClubMembers();
+    // Prevent duplicates
+    if (existing.some(m => m.clubId === data.clubId && m.pupilId === data.pupilId)) return null;
+    const member = { ...Schema.newClubMember(), ...data, id: data.id || Fmt.uid('cmem') };
+    existing.push(member);
+    Storage.set(StorageKeys.CLUB_MEMBERS, existing);
+    notify('clubMembers');
+    return member;
+  }
+  function removeClubMember(id) {
+    Storage.set(StorageKeys.CLUB_MEMBERS, getClubMembers().filter(m => m.id !== id));
+    notify('clubMembers');
+  }
+  function updateClubMember(id, patch) {
+    const all = getClubMembers();
+    const idx = all.findIndex(m => m.id === id);
+    if (idx === -1) return null;
+    all[idx] = { ...all[idx], ...patch };
+    Storage.set(StorageKeys.CLUB_MEMBERS, all);
+    notify('clubMembers');
+    return all[idx];
+  }
+  function getTripsForClub(clubId) {
+    return getTrips().filter(t => (t.clubIds || []).includes(clubId));
+  }
+
   // ----- COMPUTED STATS -----
   function tripStats(tripId = null) {
     const id = tripId || activeTripId();
@@ -461,6 +536,9 @@ const Store = (function () {
     getActivities, getActivity, createActivity, updateActivity, deleteActivity,
     getCommunications, createCommunication,
     getInterests, getInterest, updateInterest, deleteInterest, convertInterestToPupil,
+    getClubs, getClub, createClub, updateClub, deleteClub,
+    getClubMembers, getClubMembership, getMembersOfClub, getClubsForPupil,
+    addClubMember, removeClubMember, updateClubMember, getTripsForClub,
     tripStats
   };
 })();

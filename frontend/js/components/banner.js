@@ -88,6 +88,10 @@ const Banner = {
             <div class="banner-eyebrow">
               <span class="badge">${escapeHtml(trip.status)}</span>
               ${trip.tripType ? `<span class="badge badge-${trip.tripType}">${escapeHtml(trip.tripType)}</span>` : ''}
+              ${(trip.clubIds || []).map(id => {
+                const c = Store.getClub ? Store.getClub(id) : null;
+                return c ? `<span class="badge" style="background:${c.colour};">${c.emoji} ${escapeHtml(c.name)}</span>` : '';
+              }).join('')}
               <span>${escapeHtml(trip.code)}</span>
               <span class="sep">·</span>
               <span>${countdownStr}</span>

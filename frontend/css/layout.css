@@ -71,6 +71,7 @@
   border-bottom: 3px solid transparent;
   transition: all var(--t-fast);
   white-space: nowrap;
+  text-decoration: none;
 }
 .topnav-item svg {
   width: 16px;
