@@ -95,21 +95,23 @@ const ClubsDashboardPage = (function () {
     );
     grid.appendChild(engagementCard);
 
-    // Clubs by day of week
-    const dayCounts = {};
-    ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].forEach(d => dayCounts[d] = 0);
-    clubs.forEach(c => { if (dayCounts[c.meetingDay] !== undefined) dayCounts[c.meetingDay]++; });
-    const daysData = {
-      segments: Object.entries(dayCounts)
-        .filter(([_, n]) => n > 0)
-        .map(([day, n]) => ({ label: day, value: n, color: 'var(--navy)' }))
-    };
-    const daysCard = chartCard(
-      'Meeting schedule',
-      'Clubs by meeting day',
-      Charts.stackedBar(daysData)
-    );
-    grid.appendChild(daysCard);
+    // Meeting schedule — simple list grouped by day
+    const dayMap = {};
+    ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].forEach(d => dayMap[d] = []);
+    clubs.forEach(c => { if (dayMap[c.meetingDay]) dayMap[c.meetingDay].push(c); });
+    const scheduleBody = html`
+      <div class="schedule-list">
+        ${Object.entries(dayMap).filter(([_, cs]) => cs.length).map(([day, cs]) => `
+          <div class="schedule-row">
+            <div class="schedule-day">${day.slice(0, 3).toUpperCase()}</div>
+            <div class="schedule-clubs">
+              ${cs.map(c => `<span class="schedule-chip" style="background:${c.colour};">${c.emoji} ${escapeHtml(c.name)} <span style="opacity:0.7;">· ${escapeHtml(c.meetingTime)}</span></span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    grid.appendChild(chartCard('Meeting schedule', 'Clubs by day of week', scheduleBody));
 
     root.appendChild(insights);
 
