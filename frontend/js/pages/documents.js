@@ -96,7 +96,7 @@ const DocumentsPage = (function() {
 
       const table = document.createElement('table');
       table.className = 'data-table';
-      const thead = `<thead><tr><th style="width: 280px;">Pupil</th>${types.map(t => `<th style="text-align: center; width: 90px;">${escapeHtml(t.abbr)}</th>`).join('')}</tr></thead>`;
+      const thead = `<thead><tr><th style="width: 280px;">Pupil</th>${types.map(t => `<th style="text-align: center; min-width: 110px;" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</th>`).join('')}</tr></thead>`;
       table.innerHTML = thead;
       const tbody = document.createElement('tbody');
       pupils.forEach(p => {
