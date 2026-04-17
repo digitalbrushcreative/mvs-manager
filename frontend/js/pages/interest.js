@@ -53,64 +53,135 @@ const InterestPage = (function () {
             <a class="btn btn-light" href="parent/index.html" target="_blank" rel="noopener">Open parent page ↗</a>
           </div>
         </div>
-        <div id="interestListRoot"></div>
+        <div id="bulkBar" class="hidden"></div>
+        <div id="tableMount"></div>
+        <div id="tableFooter"></div>
       </div>
     `;
     root.appendChild(card);
 
-    const listRoot = card.querySelector('#interestListRoot');
-    if (!all.length) {
-      listRoot.appendChild(html`
-        <div class="empty-state">
-          <h3>No interest yet</h3>
-          <p>Share the <a href="parent/index.html" target="_blank">parent page</a> with prospective families. Submissions will appear here in real time.</p>
+    const mount = card.querySelector('#tableMount');
+    const footerMount = card.querySelector('#tableFooter');
+    const bulkBar = card.querySelector('#bulkBar');
+    let selectedIds = [];
+
+    const columns = [
+      {
+        key: 'submittedAt', label: 'Submitted', sortable: true,
+        sortFn: (a, b) => new Date(a.submittedAt) - new Date(b.submittedAt),
+        render: (i) => Fmt.relativeDate(i.submittedAt)
+      },
+      {
+        key: 'parentName', label: 'Parent', sortable: true,
+        render: (i) => `<strong>${escapeHtml(i.parentName || '')}</strong>`
+      },
+      {
+        key: 'contact', label: 'Contact',
+        render: (i) => `<span style="font-size:12px; color:var(--grey-500);">${escapeHtml([i.parentEmail, i.parentPhone].filter(Boolean).join(' · ') || '—')}</span>`
+      },
+      { key: 'pupilName', label: 'Pupil', sortable: true, render: (i) => escapeHtml(i.pupilName || '') },
+      { key: 'pupilGrade', label: 'Grade', sortable: true, width: '70px', render: (i) => i.pupilGrade ?? '—' },
+      {
+        key: 'status', label: 'Status', sortable: true, width: '160px',
+        render: (i) => `<span class="status-pill ${statusClass(i.status)}">${STATUS_LABELS[i.status] || i.status}</span>`
+      },
+      {
+        key: 'actions', label: '', width: '80px', align: 'right',
+        render: () => `<div class="row-action"><button data-row-action="open">Open</button></div>`
+      }
+    ];
+
+    const table = Table.create({
+      columns,
+      rows: all,
+      selectable: true,
+      pageSize: 20,
+      emptyState: {
+        title: 'No interest yet',
+        description: 'Share the parent page with prospective families. Submissions appear here in real time.'
+      },
+      onRowClick: (row) => openDetail(row.id),
+      onSelectionChange: (ids) => {
+        selectedIds = ids;
+        renderBulkBar();
+      }
+    });
+    mount.appendChild(table.el);
+    footerMount.appendChild(table.footer);
+
+    // Row action
+    mount.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-row-action]');
+      if (!btn) return;
+      e.stopPropagation();
+      const tr = btn.closest('tr');
+      const id = tr?.dataset.rowId;
+      if (id && btn.dataset.rowAction === 'open') openDetail(id);
+    });
+
+    function renderBulkBar() {
+      if (!selectedIds.length) {
+        bulkBar.classList.add('hidden');
+        return;
+      }
+      bulkBar.classList.remove('hidden');
+      clearNode(bulkBar);
+      bulkBar.className = 'bulk-bar';
+      bulkBar.appendChild(html`
+        <span class="count">${selectedIds.length} selected</span>
+        <span>Bulk actions</span>
+        <div class="actions">
+          <button data-bulk="message">Message…</button>
+          <button data-bulk="export">Export CSV</button>
+          <button data-bulk="status-contacted">Mark contacted</button>
+          <button data-bulk="status-declined">Mark declined</button>
+          <button data-bulk="clear">Clear</button>
         </div>
       `);
-      return;
+      bulkBar.querySelector('[data-bulk="message"]').addEventListener('click', () => {
+        CommunicationsPage.openCompose({ preselectIds: selectedIds.slice() });
+      });
+      bulkBar.querySelector('[data-bulk="export"]').addEventListener('click', () => {
+        const rows = all.filter(i => selectedIds.includes(i.id));
+        downloadInterestsCSV(rows);
+      });
+      bulkBar.querySelector('[data-bulk="status-contacted"]').addEventListener('click', () => {
+        selectedIds.forEach(id => Store.updateInterest(id, { status: 'contacted' }));
+        Toast.success(`${selectedIds.length} marked contacted`);
+        table.clearSelection();
+      });
+      bulkBar.querySelector('[data-bulk="status-declined"]').addEventListener('click', () => {
+        selectedIds.forEach(id => Store.updateInterest(id, { status: 'declined' }));
+        Toast.success(`${selectedIds.length} marked declined`);
+        table.clearSelection();
+      });
+      bulkBar.querySelector('[data-bulk="clear"]').addEventListener('click', () => table.clearSelection());
     }
-
-    const table = document.createElement('table');
-    table.className = 'data-table';
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Submitted</th>
-          <th>Parent</th>
-          <th>Contact</th>
-          <th>Pupil</th>
-          <th>Grade</th>
-          <th>Status</th>
-          <th style="text-align:right;">Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    `;
-    const tbody = table.querySelector('tbody');
-    all.forEach(i => tbody.appendChild(interestRow(i)));
-    listRoot.appendChild(table);
   }
 
-  function interestRow(i) {
-    const tr = document.createElement('tr');
-    tr.dataset.interestId = i.id;
-    const contact = [i.parentEmail, i.parentPhone].filter(Boolean).join(' · ') || '—';
-    tr.innerHTML = `
-      <td>${Fmt.relativeDate(i.submittedAt)}</td>
-      <td><strong>${escapeHtml(i.parentName || '')}</strong></td>
-      <td style="font-size:12px; color:var(--grey-500);">${escapeHtml(contact)}</td>
-      <td>${escapeHtml(i.pupilName || '')}</td>
-      <td>${i.pupilGrade ?? '—'}</td>
-      <td><span class="status-pill ${statusClass(i.status)}">${STATUS_LABELS[i.status] || i.status}</span></td>
-      <td style="text-align:right;">
-        <button class="btn btn-light btn-sm" data-action="open">Open</button>
-      </td>
-    `;
-    tr.querySelector('[data-action=open]').addEventListener('click', (e) => {
-      e.stopPropagation();
-      openDetail(i.id);
-    });
-    tr.addEventListener('click', () => openDetail(i.id));
-    return tr;
+  function downloadInterestsCSV(rows) {
+    if (!rows.length) { Toast.info('Nothing to export'); return; }
+    const esc = (v) => {
+      if (v == null) return '';
+      const s = String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = ['Submitted', 'Status', 'Parent', 'Phone', 'Email', 'Pupil', 'Grade', 'Note'];
+    const csv = [
+      headers.join(','),
+      ...rows.map(i => [
+        i.submittedAt, i.status, i.parentName, i.parentPhone, i.parentEmail,
+        i.pupilName, i.pupilGrade ?? '', i.note || ''
+      ].map(esc).join(','))
+    ].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interest-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    Toast.success(`Exported ${rows.length} interest submissions`);
   }
 
   function statusClass(status) {

@@ -98,17 +98,20 @@ const CommunicationsPage = (function() {
   // ==========================================
   //  Compose
   // ==========================================
-  function openCompose() {
+  // Options:
+  //   preselectIds: string[]  — open the modal with these pupil/interest IDs preselected
+  //                             (sets source to 'specific' automatically)
+  function openCompose(options = {}) {
     const trip = Store.activeTrip();
 
     // ---- State ----
     const state = {
       channel: 'email',
-      source: 'pupils',  // 'pupils' | 'interests' | 'specific'
-      pupilFilters: new Set(['all']),       // all | paid | deposit | pending | overdue | flagged | missing-docs
+      source: options.preselectIds?.length ? 'specific' : 'pupils',
+      pupilFilters: new Set(['all']),
       gradeFilter: 'all',
-      interestFilters: new Set(['active']), // active | new | contacted | awaiting-details | submitted | converted | declined
-      specificIds: new Set()
+      interestFilters: new Set(['active']),
+      specificIds: new Set(options.preselectIds || [])
     };
 
     const body = html`<div class="compose-wrap"><form id="composeFormEl" novalidate></form></div>`;
@@ -130,9 +133,9 @@ const CommunicationsPage = (function() {
     // Source selector
     audienceWrap.appendChild(html`
       <div class="audience-tabs" id="sourceTabs">
-        <button type="button" class="tab active" data-src="pupils">Enrolled pupils</button>
-        <button type="button" class="tab" data-src="interests">Interested parents</button>
-        <button type="button" class="tab" data-src="specific">Specific people</button>
+        <button type="button" class="tab ${state.source === 'pupils' ? 'active' : ''}" data-src="pupils">Enrolled pupils</button>
+        <button type="button" class="tab ${state.source === 'interests' ? 'active' : ''}" data-src="interests">Interested parents</button>
+        <button type="button" class="tab ${state.source === 'specific' ? 'active' : ''}" data-src="specific">Specific people</button>
       </div>
     `);
 
@@ -618,5 +621,5 @@ const CommunicationsPage = (function() {
     }
   }
 
-  return { render };
+  return { render, openCompose };
 })();

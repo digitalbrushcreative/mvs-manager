@@ -2,6 +2,38 @@
    ROSTER PAGE — pupils list with filters, bulk actions, CRUD
    ========================================== */
 
+function downloadPupilsCSV(pupils, trip) {
+  if (!pupils.length) { Toast.info('Nothing to export'); return; }
+  const headers = [
+    'Admission No', 'First Name', 'Last Name', 'Grade', 'Gender', 'DOB',
+    'Guardian Name', 'Guardian Phone', 'Guardian Email',
+    'Payment Status', 'Paid', 'Balance', 'Flagged', 'Dietary Notes', 'Medical Notes', 'Note'
+  ];
+  const esc = (v) => {
+    if (v == null) return '';
+    const s = String(v);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const rows = pupils.map(p => {
+    const bal = Store.getPupilBalance(p.id);
+    return [
+      p.admissionNo, p.firstName, p.lastName, p.grade, p.gender, p.dob || '',
+      p.guardianName, p.guardianPhone, p.guardianEmail,
+      p.paymentStatus, bal.paid, bal.balance, p.flagged ? 'yes' : '',
+      p.dietaryNotes || '', p.medicalNotes || '', p.note || ''
+    ].map(esc).join(',');
+  });
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${trip?.code || 'pupils'}-roster-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  Toast.success(`Exported ${pupils.length} pupils`);
+}
+
 const RosterPage = (function() {
   const state = {
     gradeFilter: 'all',
@@ -267,6 +299,8 @@ const RosterPage = (function() {
         <span class="count">${state.selected.length} selected</span>
         <span>Bulk actions</span>
         <div class="actions">
+          <button data-bulk="message">Message…</button>
+          <button data-bulk="export">Export CSV</button>
           <button data-bulk="status-paid">Mark paid</button>
           <button data-bulk="status-pending">Mark pending</button>
           <button data-bulk="flag">Flag</button>
@@ -275,6 +309,13 @@ const RosterPage = (function() {
           <button class="danger" data-bulk="delete">Delete</button>
         </div>
       `);
+      bulkBar.querySelector('[data-bulk="message"]').addEventListener('click', () => {
+        CommunicationsPage.openCompose({ preselectIds: state.selected.slice() });
+      });
+      bulkBar.querySelector('[data-bulk="export"]').addEventListener('click', () => {
+        const pupils = Store.getPupils(trip.id).filter(p => state.selected.includes(p.id));
+        downloadPupilsCSV(pupils, trip);
+      });
       bulkBar.querySelector('[data-bulk="status-paid"]').addEventListener('click', () => {
         Store.bulkUpdatePupils(state.selected, { paymentStatus: 'paid' });
         Toast.success(`${state.selected.length} pupils marked paid`);
