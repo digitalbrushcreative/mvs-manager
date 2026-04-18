@@ -246,15 +246,187 @@
   animation: fadeUp 0.35s ease-out both;
 }
 
-/* -------- RESPONSIVE -------- */
+/* -------- Hamburger (hidden on desktop) -------- */
+.nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--r-md);
+  flex-shrink: 0;
+}
+.nav-hamburger:hover { background: rgba(255,255,255,0.08); }
+.nav-hamburger svg { width: 22px; height: 22px; }
+
+/* -------- Side panel (mobile module switcher) -------- */
+.side-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  visibility: hidden;
+  pointer-events: none;
+}
+.side-panel.open { visibility: visible; pointer-events: auto; }
+.side-panel-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(22, 33, 63, 0.5);
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.side-panel.open .side-panel-backdrop { opacity: 1; }
+.side-panel-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(82vw, 320px);
+  background: var(--navy-darker);
+  color: var(--white);
+  transform: translateX(-100%);
+  transition: transform 220ms ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+}
+.side-panel.open .side-panel-inner { transform: translateX(0); }
+.side-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.side-panel-close {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-sm);
+}
+.side-panel-close:hover { color: var(--white); background: rgba(255,255,255,0.08); }
+.side-panel-close svg { width: 18px; height: 18px; }
+
+.side-panel-items { padding: 8px 0; overflow-y: auto; }
+.side-panel-item {
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px !important;
+  height: auto !important;
+  border-bottom: none !important;
+  border-left: 3px solid transparent;
+  font-size: 14px !important;
+  color: rgba(255,255,255,0.82) !important;
+}
+.side-panel-item svg { width: 18px !important; height: 18px !important; opacity: 0.8; }
+.side-panel-item span { display: inline !important; }
+.side-panel-item:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--white) !important;
+}
+.side-panel-item.active {
+  background: rgba(255,255,255,0.06);
+  border-left-color: var(--gold);
+  color: var(--white) !important;
+}
+.side-panel-item.active svg { color: var(--gold); opacity: 1; }
+
+/* Lock body scroll while open */
+body.side-panel-open { overflow: hidden; }
+
+/* -------- Subnav <select> mirror (mobile only) -------- */
+.subnav-select {
+  display: none;
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--white);
+  border: 1px solid var(--grey-200);
+  border-radius: var(--r-md);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy-deep);
+  margin: 10px 0;
+}
+
+/* -------- RESPONSIVE BREAKPOINTS -------- */
 @media (max-width: 1280px) {
   .content-grid { grid-template-columns: 1fr !important; }
   .kpi-grid { grid-template-columns: repeat(3, 1fr) !important; }
 }
+
+/* Tablet — hide labels, show icon-only (already handled in components.css for topnav-item span) */
+
+/* Small — collapse top nav into hamburger + panel */
 @media (max-width: 900px) {
+  .topnav { padding: 0 16px; gap: 12px; }
   .topnav-primary { display: none; }
-  .subnav { overflow-x: auto; }
+  .nav-hamburger { display: inline-flex; }
+  .topnav-brand { padding-right: 12px; gap: 10px; }
+  .brand-wordmark .line2 { display: none; }
+  .topnav-search { display: none; }
+  .user-chip .name { display: none; }
+
+  .subnav { padding: 0 16px; gap: 14px; }
+  .subnav-title { padding-right: 14px; }
+  .subnav-title .label { font-size: 13px; }
+
   .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .banner-grid { grid-template-columns: 1fr !important; }
-  h1.banner-title { font-size: 26px !important; }
+  h1.banner-title { font-size: 24px !important; }
+
+  .page { padding: 16px 16px 40px; }
 }
+
+/* Mobile — subnav becomes a dropdown */
+@media (max-width: 640px) {
+  .subnav {
+    padding: 0 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .subnav-items { display: none; }
+  .subnav-select { display: block; }
+  .subnav-title { border-right: none; padding-right: 0; padding: 10px 0 0; }
+  .subnav-action {
+    margin: 0 0 10px !important;
+    padding: 9px 14px !important;
+  }
+  .subnav-action span { display: inline; }
+
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+  .kpi { padding: 10px 12px !important; }
+  .kpi-value { font-size: 20px !important; }
+
+  .page { padding: 12px 14px 40px; }
+  .insights-grid { grid-template-columns: 1fr !important; }
+  .insights-grid .insight-card.wide { grid-column: span 1 !important; }
+}
+
+/* -------- Global horizontal-scroll guard --------
+   overflow-x: clip (not hidden) prevents page-level horizontal
+   scroll without establishing a new scroll container, so our
+   position:sticky top-nav and subnav continue to work. */
+html, body { overflow-x: clip; max-width: 100%; }
+.page, .topnav, .subnav { max-width: 100%; }
+/* Wrap long text in places that tend to overflow */
+.card-head, .card-title, .banner-meta { min-width: 0; }
+/* Ensure tables live inside .table-wrap which scrolls internally */
+.table-wrap { max-width: 100%; overflow-x: auto; }
