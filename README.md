@@ -86,12 +86,13 @@ service has a `railway.json` at its root and uses Nixpacks.
 - New Service → Deploy from GitHub → same repo
 - Settings → Source → **Root Directory** = `web`
 - Variables:
-  - `VITE_API_URL=https://<api-service>.up.railway.app` (from step 1)
+  - `API_URL=https://<api-service>.up.railway.app` (from step 1, no trailing slash)
 - Generate Domain
 
-`VITE_API_URL` is consumed at build time, so changing it requires a rebuild
-(redeploy the web service). The API service exposes `/api/health` for
-healthchecks; the web service runs `serve -s dist` so client-side routes resolve.
+The web service runs a tiny Node host (`web/server.js`) that serves `dist/` and
+proxies `/api/*` to `API_URL`. That makes the SPA same-origin (no CORS) and lets
+you change the API URL without rebuilding. The API service exposes
+`/api/health` for Railway's healthcheck.
 
 ## API
 
