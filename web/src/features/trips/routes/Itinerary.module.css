@@ -1,0 +1,105 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.day {
+  border-left: 4px solid var(--navy);
+}
+
+.dayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--grey-100);
+}
+
+.dayNum {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--navy-darker);
+}
+
+.dayDate {
+  font-size: 12px;
+  color: var(--grey-500);
+}
+
+.empty {
+  font-size: 12px;
+  color: var(--grey-400);
+  margin: 0;
+  font-style: italic;
+}
+
+.items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+}
+
+.itemButton {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  padding: 6px 8px;
+  margin: -6px -8px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+
+.itemButton:hover {
+  background: var(--grey-50);
+  border-color: var(--grey-100);
+}
+
+.itemTime {
+  flex: 0 0 60px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  padding-top: 2px;
+}
+
+.itemBody {
+  flex: 1 1 auto;
+  border-left: 2px solid var(--grey-100);
+  padding-left: 14px;
+}
+
+.itemTitle {
+  font-weight: 600;
+  color: var(--navy-darker);
+  font-size: 14px;
+}
+
+.itemDesc {
+  font-size: 12px;
+  color: var(--grey-700);
+  margin-top: 2px;
+}
+
+.itemMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--grey-500);
+}

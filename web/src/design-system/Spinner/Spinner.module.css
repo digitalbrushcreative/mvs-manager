@@ -1,0 +1,31 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--grey-500);
+}
+
+.dot {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid var(--grey-100);
+  border-top-color: var(--navy);
+  animation: spin 0.8s linear infinite;
+}
+
+.label {
+  letter-spacing: 0.04em;
+}
+
+.fullPage {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

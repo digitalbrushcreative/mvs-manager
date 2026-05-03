@@ -1,0 +1,31 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--white);
+  border: 1px solid var(--grey-200);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--grey-700);
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: var(--sans);
+}
+
+.chip:hover {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.active {
+  background: var(--navy-darker);
+  border-color: var(--navy-darker);
+  color: var(--white);
+}
+
+.count {
+  opacity: 0.7;
+  font-size: 10px;
+}

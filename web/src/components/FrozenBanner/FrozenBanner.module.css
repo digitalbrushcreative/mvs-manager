@@ -1,0 +1,29 @@
+.banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  background: var(--warning-soft);
+  border: 1px solid var(--warning);
+  border-left: 4px solid var(--warning);
+  border-radius: var(--r-md);
+  margin-bottom: 14px;
+}
+
+.icon {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.title {
+  font-weight: 700;
+  color: var(--warning);
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.body {
+  font-size: 12px;
+  color: var(--grey-700);
+  line-height: 1.5;
+}

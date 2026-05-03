@@ -1,0 +1,22 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pupilCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pupilName {
+  font-weight: 600;
+  color: var(--navy-darker);
+}
+
+.pupilMeta {
+  font-size: 11px;
+  color: var(--grey-500);
+  margin-top: 2px;
+}

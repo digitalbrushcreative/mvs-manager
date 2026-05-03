@@ -1,0 +1,117 @@
+.donut {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  flex: 1 1 auto;
+  color: var(--grey-700);
+}
+
+.legendValue {
+  font-weight: 700;
+  color: var(--navy-darker);
+  font-family: var(--mono);
+}
+
+.tileGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.tile {
+  padding: 10px 12px;
+  background: var(--grey-50);
+  border: 1px solid var(--grey-100);
+  border-radius: var(--r-md);
+}
+
+.tileButton {
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--sans);
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+.tileButton:hover {
+  border-color: var(--navy);
+  background: var(--white);
+}
+
+.tileHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.tileDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tileName {
+  flex: 1 1 auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy-darker);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tileCount {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--grey-700);
+}
+
+.tileBar {
+  height: 6px;
+  background: var(--white);
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+}
+
+.tileBar span {
+  height: 100%;
+  display: block;
+}
+
+.tileFooter {
+  font-size: 11px;
+  color: var(--grey-500);
+  margin-top: 6px;
+  line-height: 1.4;
+}

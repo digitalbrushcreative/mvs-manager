@@ -1,0 +1,17 @@
+export const StorageKeys = {
+  TRIPS: 'mvs-trips:trips',
+  PUPILS: 'mvs-trips:pupils',
+  PAYMENTS: 'mvs-trips:payments',
+  DOCUMENTS: 'mvs-trips:documents',
+  BOOKINGS: 'mvs-trips:bookings',
+  ACTIVITIES: 'mvs-trips:activities',
+  COMMUNICATIONS: 'mvs-trips:communications',
+  DOCUMENT_TYPES: 'mvs-trips:document-types',
+  INTERESTS: 'mvs-trips:interests',
+  CLUBS: 'mvs-trips:clubs',
+  CLUB_MEMBERS: 'mvs-trips:club-members',
+  STAFF: 'mvs-trips:staff',
+  USERS: 'mvs-trips:users',
+  SETTINGS: 'mvs-trips:settings',
+  SEEDED: 'mvs-trips:seeded',
+};

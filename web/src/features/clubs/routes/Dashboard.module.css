@@ -1,0 +1,93 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.miniCard {
+  text-align: left;
+  padding: 14px;
+  background: var(--white);
+  border: 1px solid var(--grey-100);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: var(--sans);
+}
+
+.miniCard:hover {
+  border-color: var(--navy-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.miniHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.miniEmoji {
+  width: 42px;
+  height: 42px;
+  color: var(--white);
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.miniName {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--navy-darker);
+}
+
+.miniMeta {
+  font-size: 11px;
+  color: var(--grey-500);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.miniLead {
+  font-size: 12px;
+  color: var(--grey-500);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.miniCounts {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--grey-500);
+}
+
+.miniCounts strong {
+  color: var(--navy-darker);
+}

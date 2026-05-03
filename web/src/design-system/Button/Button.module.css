@@ -1,0 +1,94 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font-family: var(--sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast),
+    box-shadow var(--t-fast);
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+.btn_sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.btn_md {
+  padding: 9px 16px;
+  font-size: 13px;
+}
+.btn_lg {
+  padding: 12px 20px;
+  font-size: 15px;
+}
+
+.btn_primary {
+  background: var(--crimson);
+  color: var(--white);
+  border-color: var(--crimson);
+}
+.btn_primary:hover:not(:disabled) {
+  background: var(--crimson-deep);
+  border-color: var(--crimson-deep);
+}
+
+.btn_secondary {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy);
+}
+.btn_secondary:hover:not(:disabled) {
+  background: var(--navy-deep);
+  border-color: var(--navy-deep);
+}
+
+.btn_ghost {
+  background: transparent;
+  color: var(--navy);
+  border-color: var(--grey-200);
+}
+.btn_ghost:hover:not(:disabled) {
+  border-color: var(--navy);
+  background: var(--grey-50);
+}
+
+.btn_danger {
+  background: var(--white);
+  color: var(--crimson);
+  border-color: var(--crimson-soft);
+}
+.btn_danger:hover:not(:disabled) {
+  background: var(--crimson-soft);
+}
+
+.btn_light {
+  background: var(--grey-50);
+  color: var(--grey-700);
+  border-color: var(--grey-100);
+}
+.btn_light:hover:not(:disabled) {
+  background: var(--grey-100);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+}
+.icon svg {
+  width: 16px;
+  height: 16px;
+}

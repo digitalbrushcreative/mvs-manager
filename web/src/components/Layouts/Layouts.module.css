@@ -1,0 +1,84 @@
+.app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.parentHeader {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 32px;
+  background: var(--white);
+  border-bottom: 1px solid var(--grey-100);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.parentBrand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.parentBrandText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.parentBrandLine1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--navy-darker);
+}
+
+.parentBrandLine2 {
+  font-size: 11px;
+  color: var(--grey-500);
+  letter-spacing: 0.04em;
+}
+
+.parentNav {
+  display: flex;
+  gap: 4px;
+  flex: 1 1 auto;
+  margin-left: 24px;
+}
+
+.parentNavItem {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--grey-700);
+  text-decoration: none;
+  border-radius: var(--r-md);
+}
+
+.parentNavItem:hover {
+  background: var(--grey-50);
+  color: var(--navy);
+}
+
+.parentNavActive {
+  background: var(--navy-darker);
+  color: var(--white);
+}
+.parentNavActive:hover {
+  background: var(--navy-darker);
+  color: var(--white);
+}
+
+.parentRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.parentUser {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy-darker);
+}

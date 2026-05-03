@@ -1,0 +1,78 @@
+.sectionTitle {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--navy-deep);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag {
+  background: var(--grey-100);
+  color: var(--grey-700);
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-family: var(--mono);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+.row {
+  cursor: pointer;
+  transition: border-color var(--t-fast), transform var(--t-fast);
+}
+.row:hover {
+  border-color: var(--navy-soft);
+  transform: translateY(-2px);
+}
+
+.rowHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--grey-500);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rowName {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--navy-darker);
+}
+
+.clubs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.empty {
+  font-size: 11px;
+  color: var(--grey-400);
+  font-style: italic;
+}
+
+.rowMeta {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--grey-500);
+}

@@ -1,0 +1,146 @@
+.banner {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--navy-darker) 0%, var(--navy-deep) 60%, var(--navy) 100%);
+  color: var(--white);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.body {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 24px 28px;
+  flex-wrap: wrap;
+}
+
+.editBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--r-md);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+
+.editBtn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.editBtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.heading {
+  flex: 1 1 auto;
+  min-width: 280px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.code {
+  font-family: var(--mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.sep {
+  opacity: 0.5;
+}
+
+.title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  color: var(--white);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.meta strong {
+  color: var(--white);
+}
+
+/* ---- Per-trip tabs strip (inside the navy gradient) ---- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.18);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.tab:hover {
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tabActive {
+  color: var(--navy-darker);
+  background: var(--white);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.count {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.tabActive .count {
+  background: var(--navy);
+  color: var(--white);
+}

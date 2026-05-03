@@ -1,0 +1,230 @@
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 6px 10px 6px 8px;
+  border-radius: var(--r-md);
+  background: var(--grey-50);
+  border: 1px solid var(--grey-100);
+  color: var(--navy-darker);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+
+.backLink:hover {
+  background: var(--white);
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.backLink svg {
+  width: 14px;
+  height: 14px;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--navy-darker) 0%, var(--navy-deep) 60%, var(--navy) 100%) !important;
+  color: var(--white) !important;
+  border-color: transparent !important;
+}
+
+.heroEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.heroCode {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--white);
+}
+
+.heroDest {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 4px 0 16px;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+}
+
+.heroMeta div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  min-width: 0;
+}
+
+.heroMeta div:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+@media (max-width: 600px) {
+  .heroMeta {
+    gap: 12px 0;
+  }
+  .heroMeta div {
+    flex: 1 1 45%;
+    padding: 0 12px;
+  }
+  .heroMeta div:first-child,
+  .heroMeta div:nth-child(3) {
+    padding-left: 0;
+    border-left: none;
+  }
+}
+
+.heroMeta dt {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+.heroMeta dd {
+  margin: 0;
+  font-size: 14px;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.heroDesc {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  max-width: 80ch;
+}
+
+.itineraryPanel {
+  margin: 0;
+}
+
+.itineraryPanel[open] .itineraryChevron {
+  transform: rotate(180deg);
+}
+
+.itinerarySummary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.itinerarySummary::-webkit-details-marker {
+  display: none;
+}
+
+.itineraryTitle {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--navy-darker);
+  flex: 1 1 auto;
+}
+
+.itineraryHint {
+  font-size: 12px;
+  color: var(--grey-500);
+  font-weight: 500;
+}
+
+.itineraryChevron {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--grey-50);
+  color: var(--navy);
+  font-size: 11px;
+  transition: transform var(--t-fast);
+}
+
+.itinerary {
+  list-style: none;
+  padding: 14px 0 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dayLabel {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--navy-darker);
+  margin-bottom: 8px;
+}
+
+.activities {
+  list-style: none;
+  padding: 0 0 0 16px;
+  margin: 0;
+  border-left: 2px solid var(--grey-100);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activities li {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.activityTime {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.activityDesc {
+  font-size: 12px;
+  color: var(--grey-500);
+  margin-top: 2px;
+}
+
+.sectionTitle {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--navy-deep);
+  margin: 0 0 12px;
+}

@@ -1,0 +1,78 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.naughty {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.naughtyRow {
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--grey-50);
+  border: 1px solid var(--grey-100);
+  transition: background var(--t-fast);
+}
+
+.naughtyRow:hover {
+  background: var(--white);
+  border-color: var(--crimson);
+}
+
+.naughtyRank {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--crimson);
+  text-align: center;
+}
+
+.naughtyWho {
+  min-width: 0;
+}
+
+.naughtyName {
+  font-weight: 600;
+  color: var(--navy-darker);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.naughtySub {
+  font-size: 11px;
+  color: var(--grey-500);
+  margin-top: 2px;
+}
+
+.naughtyAmount {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--crimson);
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .naughtyRow {
+    grid-template-columns: 28px 1fr auto;
+    gap: 10px;
+  }
+  .naughtyRow > button {
+    grid-column: 2 / -1;
+    justify-self: end;
+  }
+}
