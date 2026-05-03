@@ -1,9 +1,13 @@
 /**
  * Thin client over the kv-store + auth backend at /api.
- * Vite proxies /api → http://localhost:3001 in dev.
+ *
+ * Dev: relative `/api` (Vite proxies → http://localhost:3001).
+ * Prod: set VITE_API_URL at build time to the API origin
+ *       (e.g. https://mvs-api.up.railway.app).
  */
 
-const BASE = '/api';
+const RAW = (import.meta.env?.VITE_API_URL || '').replace(/\/+$/, '');
+const BASE = RAW ? `${RAW}/api` : '/api';
 
 function authHeaders() {
   try {

@@ -66,6 +66,33 @@ Demo logins:
 - Admin — `admin@mvs.test` / `admin123`
 - Parent — `parent@example.com` / `parent123`
 
+## Deploying to Railway
+
+The repo is set up for two Railway services from this single GitHub repo. Each
+service has a `railway.json` at its root and uses Nixpacks.
+
+**1. API service (`backend/`)**
+
+- New Service → Deploy from GitHub → repo `mvs-manager`
+- Settings → Source → **Root Directory** = `backend`
+- Variables:
+  - `DB_PATH=/data/mvs.sqlite`
+  - `NODE_ENV=production`
+- Volumes → New Volume, mount path `/data`, size 1GB
+- Generate Domain → note the `*.up.railway.app` URL (used below)
+
+**2. Web service (`web/`)**
+
+- New Service → Deploy from GitHub → same repo
+- Settings → Source → **Root Directory** = `web`
+- Variables:
+  - `VITE_API_URL=https://<api-service>.up.railway.app` (from step 1)
+- Generate Domain
+
+`VITE_API_URL` is consumed at build time, so changing it requires a rebuild
+(redeploy the web service). The API service exposes `/api/health` for
+healthchecks; the web service runs `serve -s dist` so client-side routes resolve.
+
 ## API
 
 Base URL: `http://localhost:3001/api` (Vite proxies `/api/*` to this in dev).
