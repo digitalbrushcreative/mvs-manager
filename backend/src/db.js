@@ -14,4 +14,14 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
 
+// First-run demo seed. Idempotent — guarded by `mvs-trips:seeded`.
+try {
+  const result = require('./seed')(db);
+  if (result.seeded) {
+    console.log('[db] seeded demo data:', result.counts);
+  }
+} catch (err) {
+  console.error('[db] seed failed:', err.message);
+}
+
 module.exports = db;
