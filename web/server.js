@@ -16,7 +16,12 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
-const API_URL = (process.env.API_URL || '').replace(/\/+$/, '');
+
+// Normalize: strip trailing slashes AND a trailing /api so users can paste
+// either `https://api.example.com` or `https://api.example.com/api`.
+const API_URL = (process.env.API_URL || '')
+  .replace(/\/+$/, '')
+  .replace(/\/api$/, '');
 
 if (!API_URL) {
   console.warn('[web] API_URL is not set — /api requests will 502.');
@@ -27,11 +32,28 @@ const app = express();
 if (API_URL) {
   app.use(
     createProxyMiddleware({
-      pathFilter: (path) => path.startsWith('/api'),
+      pathFilter: (p) => p.startsWith('/api'),
       target: API_URL,
       changeOrigin: true,
       xfwd: true,
-      logLevel: 'warn',
+      logger: console,
+      on: {
+        proxyReq: (_proxyReq, req) => {
+          console.log(`[proxy] ${req.method} ${req.url} → ${API_URL}${req.url}`);
+        },
+        proxyRes: (proxyRes, req) => {
+          if (proxyRes.statusCode >= 400) {
+            console.warn(`[proxy] ${req.method} ${req.url} ← ${proxyRes.statusCode}`);
+          }
+        },
+        error: (err, req, res) => {
+          console.error(`[proxy] ${req.method} ${req.url} error:`, err.message);
+          if (res && !res.headersSent) {
+            res.writeHead(502, { 'Content-Type': 'application/json' });
+          }
+          if (res) res.end(JSON.stringify({ error: 'upstream proxy failed', detail: err.message }));
+        },
+      },
     }),
   );
 }
