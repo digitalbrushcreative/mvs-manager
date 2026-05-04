@@ -19,6 +19,12 @@
   margin-bottom: 24px;
 }
 
+.logo {
+  width: 140px;
+  height: 140px;
+  display: block;
+}
+
 .title {
   font-family: var(--display);
   font-weight: 700;

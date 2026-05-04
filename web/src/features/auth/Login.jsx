@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button, Card, FormField, FormGrid, Input, useToast } from '../../design-system';
-import { Crest } from '../../components/Crest/Crest';
 import { useAuth } from '../../lib/auth';
 import styles from './Login.module.css';
 
@@ -37,7 +36,11 @@ export function LoginPage() {
     <div className={styles.wrap}>
       <Card className={styles.card} padded>
         <div className={styles.brand}>
-          <Crest size="lg" />
+          <img
+            className={styles.logo}
+            src="/mvs-logo-icon.svg"
+            alt="Mountain View School crest"
+          />
           <h1 className={styles.title}>Mountain View School</h1>
           <p className={styles.sub}>Field Trips · Staff &amp; Parent Portal</p>
         </div>
